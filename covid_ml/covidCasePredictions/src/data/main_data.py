@@ -20,7 +20,32 @@ from sklearn.preprocessing import MinMaxScaler
 
 print('In this file I analyse covid data')
 
+print('Weather data')
+# Import Meteostat library and dependencies
+from datetime import datetime
+import matplotlib.pyplot as plt
+from meteostat import Point, Daily
 
+# Set time period
+start = datetime(2020, 1, 1)
+end = datetime(2021, 7, 1)
+
+# Create Point for Berlin
+berlin = Point(50.52008, 13.404954, 34)
+
+# Get daily data for 2018
+data = Daily(berlin, start, end)
+data = data.fetch()
+
+# Just for fun: Plot line chart including average, minimum and maximum temperature
+data.plot(y=['tavg', 'tmin', 'tmax'])
+plt.show()
+plt.savefig('covid_ml/covidCasePredictions/reports/figures/temperatures_berlin.png')
+
+df_weather = pd.DataFrame(data)
+print('inspect weather data for Berlin')
+print(df_weather.head)
+print('Data on measuers')
 df_measures = pd.read_excel('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/external/response_graphs_data_2021-06-09.xlsx')
 print(df_measures.head)
 
@@ -130,9 +155,11 @@ print(df.head())
 
 # Join datasets
 #result = pd.concat([df, df_m], axis=1)
-result = pd.concat([df, df_m2], axis=1)
+result = pd.concat([df, df_m2, df_weather], axis=1)  # join data on measures with owid data
 print('did join work?')
-#print(result.head())
+# result = pd.concat([df, df_m2], axis=1) #
+
+print(result.head())
 
 result['R_kat'] = np.where(result['reproduction_rate'] < 1, 0, 1)
 print(result[['R_kat','reproduction_rate']])
