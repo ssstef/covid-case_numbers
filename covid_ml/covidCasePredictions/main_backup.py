@@ -23,24 +23,35 @@ from sklearn.preprocessing import MinMaxScaler
 
 print('In this file I build a dataset to analyse covid data')
 
-df_weather = pd.read_excel('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/external/weather_data3.xlsx')
-df_weather = pd.read_excel('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/external/weather_data3.xlsx')
-print(df_weather.head())
-print('works till here?')
+print('Weather data')
+# Import Meteostat library and dependencies
+from datetime import date
+from datetime import datetime
+import matplotlib.pyplot as plt
+from meteostat import Point, Daily
+
+# Set time period
+start = datetime(2020, 1, 1)
+end = datetime(2021, 7, 1)
+
+# Create Point for Berlin
+berlin = Point(50.52008, 13.404954, 34)
+
+# Get daily data for 2018
+data = Daily(berlin, start, end)
+data = data.fetch()
+
+# Just for fun: Plot line chart including average, minimum and maximum temperature
+data.plot(y=['tavg', 'tmin', 'tmax'])
+#plt.show()
+#plt.savefig('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/reports/figures/temperatures_berlin.png')
+['date'] = np.where(result['reproduction_rate'] < 1, 0, 1)
+print(result[['date','reproduction_rate']])
 
 
-# Neue Column Namen
-df_weather.rename(columns=df_weather.iloc[0])
-new_header = df_weather.iloc[0] #grab the first row for the header
-df_weather = df_weather[1:] #take the data less the header row
-df_weather.columns = new_header #set the header row as the df header
-
-df_weather.set_index(df_weather['time'], inplace=True)  #!! eventuell wieder rein
-print('is time now index?')
-
-
-#df_weather_format = df_weather['time'].dt.
-#df_weather['Date'] = floor_date.df_weather['time']
+date = weather_df[floor_date()
+df_weather = pd.DataFrame(data)
+df_weather['Date'] = floor_date.df_weather['time']
 # Change date forrmat to match other datasets
 #df_weather['just_date'] = df_weather['date'].dt.date nope
 print('inspect weather data for Berlin')
@@ -90,22 +101,18 @@ print('print shape')
 #print('pivot to allow merging datasets later')
 df_m2=df_m.pivot(index='date', columns='Response_measure')
 print(df_m2.shape)
-print(df_m2.head())
-print('head dfm2')
+
 
 
 print('print shape')
 
 df_m2.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/response_graphs_pivot.csv')
 
-df_m2 = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/external/response_graphs_pivot_3.csv', sep=';')
-
 print('see all columns')
 print(df_m)
-print('df_m2 kopf angepasst')
-print(df_m2.head())
+
 # Set date as index
-#df_m.set_index(df_m['date'], inplace=True)  !! eventuell wieder rein
+df_m.set_index(df_m['date'], inplace=True)
 print('date now index?')
 print(df_m.head())
 df_m.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/response_graphs_reshaped_date_index.csv')
@@ -154,41 +161,26 @@ print(col_mapping_dict)
 
 #df['date'] = pd.to_datetime(df['date'])  # , format='%Y%m%d'
 # Set date as index
-df.set_index(df['date'], inplace=True) #!! eventuell wieder rein
-print(df_m2.head())
-#df_m2.set_index(df_m2['date'], inplace=True)
-df_m2.set_index('Date', inplace= True)
-
+df.set_index(df['date'], inplace=True)
 print('is date now index?')
-print(df_m2.head())
+print(df.head())
 
 #Pivot to allow for joining the datasets
 
 
 # Join datasets
-# Join datasets
 #result = pd.concat([df, df_m], axis=1)
-#result = pd.concat([df, df_m2, df_weather], axis=1)  # join data on measures with owid data
-#result_prep = df.join(df_m2)
-#result = result_prep.join(df_weather)
-result_prep = df.join(df_m2)  #, how='left', lsuffix='_left', rsuffix='_right')
-result = result_prep.join(df_weather)
-
-print('HIER !?')
-print(result.head())
-
+result = pd.concat([df, df_m2, df_weather], axis=1)  # join data on measures with owid data
 print('did join work?')
 # result = pd.concat([df, df_m2], axis=1) #
-print('hier sind die ERgebnisse')
+
 print(result.head())
-result.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join4.csv')
 
 result['R_kat'] = np.where(result['reproduction_rate'] < 1, 0, 1)
 print(result[['R_kat','reproduction_rate']])
 
 result.drop(['reproduction_rate'], axis=1, inplace=True)
 result.drop(['date'], axis=1, inplace=True)
-result.drop(['time'], axis=1, inplace=True)
 result.drop(['tests_units'], axis=1, inplace=True)
 #result['R_kat'] = 0 if result['reproduction_rate'] < 1 else 1
 #result['R_kat'] = result['reproduction_rate'>=1==1, 'reproduction_rate'<1 ==0]
@@ -324,7 +316,7 @@ enc_df = pd.DataFrame(onehotlist.toarray())
 df_join = df.join(pd.DataFrame(enc_df.toarray(), columns=onehot_enc.categories_[0]))
 
 print('did join work?')
-df.set_index('date', inplace=True)  #!! eventuell wieder einkommentieren
+df.set_index('date')
 print('did index setting work?')
 print(df.head())
 

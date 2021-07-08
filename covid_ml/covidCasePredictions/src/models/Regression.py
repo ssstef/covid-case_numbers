@@ -1,22 +1,14 @@
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.svm import SVC
-import numpy as np
-import pandas as pd
-import pickle as pi
-from sklearn.linear_model import LogisticRegression, SGDClassifier
-from sklearn.naive_bayes import GaussianNB
+#to calculate adjusted R2
+n = len()  # sample size = number of rows
+p = len(X_train) #number of variables = everrything included in X
+r2 = make_scorer(r2_score)
+r2_val_score = cross_val_score(clf, x, y, cv=cv,scoring=r2)
+scores=[r2_val_score.mean()]
+return scores
+adj_r2 = 1-(1-r2)*(n-1)/(n-p-1)
 
-#Ensemble learning
-from sklearn.model_selection import cross_val_score
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.ensemble import VotingClassifier
-
-class Classifier:
+class Regression:
     def __init__(self):
         # Array für alle Ergebnisse
         self.ergebnis = []
@@ -101,22 +93,6 @@ class Classifier:
                 score =scores.mean()
                 self.ergebnis.append(['Ensemble Learning (Ada Boost)', score, ada])
 
-            # -----------------------
-            # Ensemble Learning (Voting)
-            # -----------------------
-            elif self.model == 'voting':
-                clf1 = LogisticRegression(random_state=1)
-                clf2 = RandomForestClassifier(n_estimators=50, random_state=1)
-                clf3 = GaussianNB()
-                vclf = VotingClassifier(
-                    estimators=[('lr', clf1), ('rf', clf2), ('gnb', clf3)],
-                    voting='hard')
-
-                for clf, label in zip([clf1, clf2, clf3, vclf],['Logistic Regression', 'Random Forest', 'naive Bayes', 'Ensemble - Voting']):
-                    scores = cross_val_score(clf, X_test, y_test, scoring='accuracy', cv=5)
-                   # print("Accuracy: %0.2f (+/- %0.2f) [%s]" % (scores.mean(), scores.std(), label))
-                self.ergebnis.append(['Enseble Learning - Voting', a.all(scores), vclf])
-
 
             # -----------------------
             # MLP
@@ -134,7 +110,5 @@ class Classifier:
                 # plt.plot(epochs, mlp.loss_curve_, label="Fehlerfunktion")
                 # plt.plot(weight,2* weight,label="Ableitung")
                 # plt.show()
-
-
 
         return self.ergebnis
