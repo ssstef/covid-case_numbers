@@ -21,10 +21,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
 
-print('In this file I build a dataset to analyse covid data')
+#'In this file I build a dataset to analyse covid data'
 
 df_weather = pd.read_excel('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/external/weather_data3.xlsx')
-df_weather = pd.read_excel('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/external/weather_data3.xlsx')
+
 print(df_weather.head())
 print('works till here?')
 
@@ -61,7 +61,8 @@ df_measures.drop(['Country'], axis=1, inplace=True)
 col_mapping_measures = [f"{c[0]}:{c[1]}" for c in enumerate(df_measures.columns)]
 col_mapping_dict_measures = {c[0]:c[1] for c in enumerate(df_measures.columns)}
 print(col_mapping_dict_measures)
-
+## New Column names for visualization
+#col_names = []
 
 # fill in nan in end_date with latest date of  downloaded data: 2021-06-10
 df_measures.fillna('2021-06-10', inplace=True)
@@ -204,6 +205,15 @@ result.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/
 
 # Für erste Analysen ohne Datumsangabe
 result.reset_index(drop=True, inplace=True)
+
+# Liste der Spalten
+# Column names in dict and list
+col_mapping = [f"{c[0]}:{c[1]}" for c in enumerate(result.columns)]
+col_mapping_dict = {c[0]:c[1] for c in enumerate(result.columns)}
+columns_join1 = result.columns
+print('Column names', columns_join1)
+
+
 result.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join1.csv')
 #df = pd.DataFrame(df, index=date) #kann weg?
 

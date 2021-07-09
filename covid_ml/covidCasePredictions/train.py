@@ -2,6 +2,7 @@ import os
 import sys
 sys.path.append("src/models/")
 sys.path.append("src/data/")
+sys.path.append("src/visualization/")
 import pandas as pd
 from Classifier import Classifier
 
@@ -12,10 +13,11 @@ from sklearn.utils.fixes import loguniform
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder
+# lokal gespeichert/selbst geschrieben
 from Preprocessor import Preprocessor
-
-
 from Classifier import Classifier
+from visualize import decision_tree
+
 from operator import itemgetter, attrgetter
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
@@ -25,14 +27,14 @@ from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.linear_model import SGDClassifier
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 
-daten_prepared = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join1.csv')  #join1 klappt !!
+df = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join1.csv')  #join1 klappt !!
 
-print(daten_prepared.head())
+print(df.head())
 
-
-X = daten_prepared.loc[:, daten_prepared.columns != "R_kat"]
-y = daten_prepared["R_kat"]
+X = df.loc[:, df.columns != 'R_kat']
+y = df["R_kat"]
 
 X_train, X_test, y_train, y_test, scaler = Preprocessor(X, y).get_data()
 
@@ -82,6 +84,6 @@ n_iter_search = 20
 random_search = RandomizedSearchCV(clf, param_distributions=param_dist,
                                    n_iter=n_iter_search)
 random_search.fit(X_test, y_test)
-print("RandomizedSearchCV took %.2f seconds for %d candidates"
-      " parameter settings." % ((time() - start), n_iter_search))
+#print("RandomizedSearchCV took %.2f seconds for %d candidates"
+ #     " parameter settings." % ((time() - start), n_iter_search))
 report(random_search.cv_results_)

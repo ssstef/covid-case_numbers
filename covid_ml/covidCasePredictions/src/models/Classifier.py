@@ -1,3 +1,6 @@
+import os
+import sys
+sys.path.append('visualization')
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 
 from sklearn.neighbors import KNeighborsClassifier
@@ -10,7 +13,7 @@ import pandas as pd
 import pickle as pi
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.naive_bayes import GaussianNB
-
+from visualize import decision_tree
 #Ensemble learning
 from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import AdaBoostClassifier
@@ -65,6 +68,9 @@ class Classifier:
 
                 # Besten gefundenen Decision Tree übergeben
                 dt_clf = grd_clf.best_estimator_
+
+                #Besten gefundenen Decision Tree ausgeben
+                decision_tree(best_model = dt_clf, X = X_test)
 
                 score = dt_clf.score(X_test, y_test)
                 self.ergebnis.append(['decision tree', score, dt_clf])
@@ -134,6 +140,10 @@ class Classifier:
                 # plt.plot(epochs, mlp.loss_curve_, label="Fehlerfunktion")
                 # plt.plot(weight,2* weight,label="Ableitung")
                 # plt.show()
+
+                # -----------------------
+                # Confusion matrix
+                # -----------------------
 
 
 
