@@ -4,7 +4,6 @@ sys.path.append("src/models/")
 sys.path.append("src/data/")
 sys.path.append("src/visualization/")
 import pandas as pd
-from Classifier import Classifier
 
 #SGD and Ensemble
 import scipy.stats as stats
@@ -17,6 +16,8 @@ from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder
 from Preprocessor import Preprocessor
 from Classifier import Classifier
 from visualize import decision_tree
+#from visualize import confmat_plot
+
 
 from operator import itemgetter, attrgetter
 from sklearn.neighbors import KNeighborsClassifier
@@ -29,12 +30,22 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 
-df = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join1.csv')  #join1 klappt !!
+import matplotlib.pyplot as plt
+from sklearn.metrics import plot_confusion_matrix
+
+df = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead.csv')  #join1 klappt !!
+class_names = ['decreasing covid cases', 'increasing covid cases']
 
 print(df.head())
 
-X = df.loc[:, df.columns != 'R_kat']
+# To use R_kat --> to predict today's reproduction rate
+#X = df.loc[:, df.columns != 'R_kat']
+X = df.iloc[:, :-6]
 y = df["R_kat"]
+# To predict tomorrow's reproduction rate
+X = df.iloc[:, :-6]
+y = df['r_kat_lag_5']
+# To predict reproduction ratet 5 days from now
 
 X_train, X_test, y_train, y_test, scaler = Preprocessor(X, y).get_data()
 
@@ -54,6 +65,25 @@ print("Bestes Model ist: {} mit einer Akkuranz von {}%".format(sorted(resultat, 
 bestes_model = sorted(resultat, key=itemgetter(1), reverse=True)[0][2]
 print("Alle Ergebnisse: {}".format(resultat))
 
+#Confusion Matrix für das beste Modell ausgeben
+np.set_printoptions(precision=2)
+
+# # Plot non-normalized confusion matrix
+# for model in models:
+#     titles_options = [("Confusion matrix, without normalization", None),
+#                   ("Normalized confusion matrix", 'true')]
+#     for title, normalize in titles_options:
+#         disp = plot_confusion_matrix(model, X_test, y_test,
+#                                 display_labels=class_names,
+#                                 cmap=plt.cm.Blues,
+#                                 normalize=normalize)
+#         disp.ax_.set_title(title)
+#         print(title)
+#         print(disp.confusion_matrix)
+#         plt.show()
+#         plt_name = "Confmat" + model + ".png"
+#         plt.savefig(Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/reports/figures/plt_name)
+#
 
 # Parameter optimieren
 # build a SGD classifier
@@ -74,6 +104,11 @@ def report(results, n_top=3):
             print("")
 
 
+
+#Print confusion matrix
+#confmat_plot(cm, alg='dt')
+
+
 # specify parameters and distributions to sample from
 param_dist = {'average': [True, False],
               'l1_ratio': stats.uniform(0, 1),
@@ -87,3 +122,5 @@ random_search.fit(X_test, y_test)
 #print("RandomizedSearchCV took %.2f seconds for %d candidates"
  #     " parameter settings." % ((time() - start), n_iter_search))
 report(random_search.cv_results_)
+
+
