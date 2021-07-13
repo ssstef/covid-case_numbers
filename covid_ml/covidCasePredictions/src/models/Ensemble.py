@@ -19,8 +19,6 @@ from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import VotingClassifier
 import matplotlib.pyplot as plt
-from sklearn.metrics import plot_confusion_matrix
-from matplotlib.pyplot import figure
 
 class Classifier:
     def __init__(self):
@@ -48,10 +46,6 @@ class Classifier:
                 # Knn-Classifier Akkuranz bestimmen
                 score = knnclf.score(X_test, y_test)
                 self.ergebnis.append(['knn-classifier', score, knnclf])
-
-                # Confusion Matrix
-                confusion_matrix(model = knnclf, X_test = X_test, y_test = y_test, name='knn')
-
             # -----------------------
 
             # -----------------------
@@ -81,9 +75,6 @@ class Classifier:
 
                 score = dt_clf.score(X_test, y_test)
                 self.ergebnis.append(['decision tree', score, dt_clf])
-
-                # Confusion Matrix
-                confusion_matrix(model=dt_clf, X_test=X_test, y_test=y_test, name='dt')
             # -----------------------
 
             # -----------------------
@@ -95,9 +86,6 @@ class Classifier:
                 rf.fit(X_train, y_train)
                 score = rf.score(X_test, y_test)
                 self.ergebnis.append(['random forest', score, rf])
-
-                # Confusion Matrix
-                confusion_matrix(model=rf, X_test=X_test, y_test=y_test, name='rf')
             # -----------------------
 
             # -----------------------
@@ -109,9 +97,6 @@ class Classifier:
                 score = svm.score(X_test, y_test)
                 self.ergebnis.append(['support vector machine', score, svm])
 
-                # Confusion Matrix
-                confusion_matrix(model=svm, X_test=X_test, y_test=y_test, name='svm')
-
 
             # -----------------------
             # Ensemble Learning (Ada Boost)
@@ -122,9 +107,6 @@ class Classifier:
                 scores = cross_val_score(ada, X_test, y_test, cv=5)
                 score =scores.mean()
                 self.ergebnis.append(['Ensemble Learning (Ada Boost)', score, ada])
-
-                # Confusion Matrix
-                confusion_matrix(model=ada, X_test=X_test, y_test=y_test, name='ada')
 
             # -----------------------
             # Ensemble Learning (Voting)
@@ -142,9 +124,6 @@ class Classifier:
                    # print("Accuracy: %0.2f (+/- %0.2f) [%s]" % (scores.mean(), scores.std(), label))
                 self.ergebnis.append(['Enseble Learning - Voting', a.all(scores), vclf])
 
-                # Confusion Matrix
-                confusion_matrix(model=vclf, X_test=X_test, y_test=y_test, name='voting')
-
 
             # -----------------------
             # MLP
@@ -159,40 +138,14 @@ class Classifier:
                 print("iterations: {}; layers: {}; loss: {}".format(mlp.n_iter_, mlp.n_layers_, mlp.loss_))
                 epochs = np.linspace(1, mlp.n_iter_, mlp.n_iter_)
 
-                #plt.plot(epochs, mlp.loss_curve_, label="Fehlerfunktion")
+                plt.plot(epochs, mlp.loss_curve_, label="Fehlerfunktion")
                # plt.plot(weight,2* weight,label="Ableitung")
-                #plt.show()
+                plt.show()
+
+                # -----------------------
+                # Confusion matrix
+                # -----------------------
 
 
 
         return self.ergebnis
-
-
- # Confusion Matrix ausgeben
-def confusion_matrix(model,  X_test, y_test, name):
-    class_names = ['covid cases decreasing', 'covid cases increasing']
-    titles_options = [("Confusion matrix, without normalization", None),
-                                  ("Normalized confusion matrix", 'true')]
-    # change the working directory
-    path_start = os.getcwd()
-    pathr = os.path.dirname(os.getcwd()) + '/covidCasePredictions/reports/figures'
-    os.chdir(pathr)
-
-    for title, normalize in titles_options:
-
-        disp = plot_confusion_matrix(model, X_test, y_test,
-                                     display_labels=class_names,
-                                     cmap=plt.cm.Blues,
-                                     normalize=normalize)
-        #plt.figure(figsize=(12, 8))  # --> doesn't do anything here, creates empty figures further down :-(
-        disp.ax_.set_title(title)
-        print(title)
-        print(disp.confusion_matrix)
-
-        plt_name = 'Confmat_' + name + '.png'
-        plt.rcParams['figure.figsize'] = (6, 4)
-        plt.tight_layout()
-        plt.savefig(plt_name)
-        plt.rcParams["figure.figsize"] = plt.rcParamsDefault["figure.figsize"] # back to default for later figures
-        #plt.show()
-    os.chdir(path_start)
