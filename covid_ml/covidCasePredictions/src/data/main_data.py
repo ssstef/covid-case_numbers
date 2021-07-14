@@ -189,8 +189,11 @@ print(result[['R_kat','reproduction_rate']])
 
 result.drop(['reproduction_rate'], axis=1, inplace=True)
 result.drop(['date'], axis=1, inplace=True)
+# rename new index column
+df.rename(columns={"Unnamed: 0" : "days since pandemic"}, inplace=True)  ##df.rename(columns={ df.columns[1]: "your value" }, inplace = True)
 result.drop(['time'], axis=1, inplace=True)
 result.drop(['tests_units'], axis=1, inplace=True)
+
 #result['R_kat'] = 0 if result['reproduction_rate'] < 1 else 1
 #result['R_kat'] = result['reproduction_rate'>=1==1, 'reproduction_rate'<1 ==0]
 #Fill in the rest of the values with 0 (I have to do this more selectively later on!!)
@@ -257,6 +260,8 @@ for lag in range(1, number_lags + 1):
 
 # Drop rows that have missing values now.
 df = df.dropna()
+
+
 
 print(df.head())
 df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead.csv')

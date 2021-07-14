@@ -21,6 +21,10 @@ from sklearn.ensemble import VotingClassifier
 import matplotlib.pyplot as plt
 from sklearn.metrics import plot_confusion_matrix
 from matplotlib.pyplot import figure
+import seaborn as sns
+
+# Heatmap
+import matplotlib.pyplot as plt
 
 class Classifier:
     def __init__(self):
@@ -196,3 +200,78 @@ def confusion_matrix(model,  X_test, y_test, name):
         plt.rcParams["figure.figsize"] = plt.rcParamsDefault["figure.figsize"] # back to default for later figures
         #plt.show()
     os.chdir(path_start)
+
+
+# only show high correlations
+def high_correlation(data):
+    ndf = data.loc[data.max(axis=1) > 0.90, data.max(axis=0) > 0.90]
+    sns.heatmap(ndf)
+    plt.show()
+    plt.savefig('high_correlation_point9.png', dpi=300)
+
+# Correlation matrix
+def correlation(data):
+    # change the working directory
+    path_start = os.getcwd()
+    pathr = os.path.dirname(os.getcwd()) + '/covidCasePredictions/reports/figures'
+    os.chdir(pathr)
+
+    corr = data.corr()
+    ax = sns.heatmap(
+                 corr,
+                 vmin=-1, vmax=1, center=0,
+                 cmap=sns.diverging_palette(20, 220, n=200),
+                 square=True
+             )
+
+    sns.heatmap(corr)
+    figure = ax.get_figure()
+   # plt.subplots(figsize=(40, 40))
+    plt.rcParams['figure.figsize'] = (25, 20)
+   # plt.tight_layout()
+    plt.savefig('heatmap2.png', dpi=300)
+    plt.rcParams["figure.figsize"] = plt.rcParamsDefault["figure.figsize"]  # back to default for later figures
+    os.chdir(path_start)
+
+
+
+# def correlation(data):
+#     # Map of columns --> use only index number (along with legend) for heatmap
+#     # Column names in dict and list
+#     col_mapping = [f"{c[0]}:{c[1]}" for c in enumerate(data.columns)]
+#     col_mapping_dict = {c[0]: c[1] for c in enumerate(data.columns)}
+#
+#     # change the working directory
+#     path_start = os.getcwd()
+#     pathr = os.path.dirname(os.getcwd()) + '/covidCasePredictions/reports/figures'
+#     os.chdir(pathr)
+#
+#     corr = data.corr()
+#     print('Correlation matrix', corr)
+#     ax = sns.heatmap(
+#         corr,
+#         vmin=-1, vmax=1, center=0,
+#         cmap=sns.diverging_palette(20, 220, n=200),
+#         square=True
+#     )
+#     ax.set_xticklabels(
+#        ax.get_xticklabels(),
+#        rotation=45,
+#        horizontalalignment='right'
+#     )
+#    # plt.rcParams['figure.figsize'] = (14, 12)
+#     plt.subplots(figsize=(35, 25))
+#     #plt.figure(figsize=(20, 20))
+#     #ax = plt.subplot(111)
+#     #sns.heatmap(corr, ax=ax)
+#     sns.heatmap(corr)
+#     #fig, ax = plt.subplots(figsize=(15, 15))
+#     figure = ax.get_figure()
+#     plt.tight_layout()
+#     figure.savefig('heatmap.png', dpi=300)
+#     plt.rcParams["figure.figsize"] = plt.rcParamsDefault["figure.figsize"]
+#
+#     plt.subplots(figsize=(40, 40))
+#     sns.heatmap(corr)
+#     figure.savefig('heatmap2.png', dpi=300)
+#     os.chdir(path_start)
