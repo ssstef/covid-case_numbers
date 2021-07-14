@@ -17,7 +17,8 @@ from Preprocessor import Preprocessor
 from Classifier import Classifier
 from visualize import decision_tree
 #from visualize import confmat_plot
-
+from Classifier import correlation
+from Classifier import high_correlation
 
 from operator import itemgetter, attrgetter
 from sklearn.neighbors import KNeighborsClassifier
@@ -35,6 +36,10 @@ from sklearn.metrics import plot_confusion_matrix
 
 df = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead.csv')  #join1 klappt !!
 class_names = ['decreasing covid cases', 'increasing covid cases']
+
+# Save correlation matrix
+high_correlation(data=df)
+#correlation(data=df)
 
 print(df.head())
 

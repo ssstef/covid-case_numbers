@@ -6,6 +6,14 @@ sys.path.append("src/models/")
 sys.path.append("src/data/")
 sys.path.append("src/visualization/")
 
+# Warum lässt sich das hier nicht importieren?!
+# lokal gespeichert/selbst geschrieben
+from Preprocessor import Preprocessor
+from Classifier import Classifier
+from visualize import decision_tree
+#from visualize import confmat_plot
+from Classifier import correlation
+
 
 from datetime import date, datetime
 
@@ -22,11 +30,13 @@ plt.style.use('ggplot')  # Make figures pretty
 #To preprocess data
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from visualize import correlation
+#import Classifier
+from Classifier import Classifier
+from Classifier import correlation
 
 print('In this file I do descriptive analyses on the covid data generated in main_data')
 
-data = pd.DataFrame('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join1.csv')
+data = pd.DataFrame('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead.csv')
 
 correlation(data=data)
 
