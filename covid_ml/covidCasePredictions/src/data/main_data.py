@@ -241,8 +241,12 @@ df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covi
 #new_tests_smoothed_per_thousand already in dataset
 #weekly_hosp_admissions_per_million in data
 df.drop(['new_vaccinations_smoothed_per_million', 'excess_mortality', 'new_vaccinations' ,	'new_vaccinations_smoothed' , 'total_vaccinations_per_hundred', 'total_vaccinations', 'people_vaccinated' , 'people_fully_vaccinated' , 'total_tests' , 'total_tests_per_thousand' ,'new_tests_smoothed', 'weekly_hosp_admissions'], axis=1, inplace=True)
-#Delete when predicting cases, not if trying to predict deaths!
-df.drop(['icu_patients' ,'icu_patients_per_million', 'total_deaths', 'new_deaths' ,	'new_deaths_smoothed' ], axis=1, inplace=True)
+# Also delete
+# new_cases: keep only smoothed, total_cases_per_million: keep only total, new_deaths_smoothed_per_million (keep non smoothed)
+df.drop(['new_cases', 'total_cases_per_million', 'new_cases_per_million', 'new_cases_smoothed_per_million', 'new_deaths_smoothed_per_million'], axis=1, inplace=True)
+#Delete when predicting cases, not if trying to predict deaths! Then keep one for hospitalization, one fo deaths
+df.drop(['icu_patients' ,'icu_patients_per_million', 'total_deaths', 'new_deaths' ,	'new_deaths_smoothed', 'total_deaths_per_million', 'new_deaths_per_million'], axis=1, inplace=True)
+# Delete more because too many variables, some quiet correlated
 
 
 columns_df = df.columns

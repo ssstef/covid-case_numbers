@@ -57,37 +57,65 @@ def decision_tree(best_model, X):
     # os.system("dot -Tps Covid_tree.dot -o Covid_tree.ps")
 
    # export_graphviz(best_model, out_file=("Covid_tree.dot"), feature_names=X.columns[:],
-
-    export_graphviz(best_model, out_file=("Covid_tree.dot"),  feature_names=['day since pandemic' , 'total_cases', 'new_cases', 'new_cases_smoothed',
-       'total_cases_per_million', 'new_cases_per_million',
-       'new_cases_smoothed_per_million', 'total_deaths_per_million',
-       'new_deaths_per_million', 'new_deaths_smoothed_per_million',
-       'weekly_hosp_admissions_per_million', 'new_tests_smoothed_per_thousand',
-       'positive_rate', 'tests_per_case', 'people_vaccinated_per_hundred',
-       'people_fully_vaccinated_per_hundred', 'stringency_index',
-       'BanOnAllEvents', 'BanOnAllEventsPartial', 'ClosDaycare',
-       'ClosDaycarePartial', 'ClosPrim', 'ClosPrimPartial', 'ClosPubAny',
-       'ClosPubAnyPartial', 'ClosSec', 'ClosSecPartial', 'EntertainmentVenues',
-       'EntertainmentVenuesPartial', 'GymsSportsCentres',
-       'GymsSportsCentresPartial', 'HotelsOtherAccommodationPartial',
-       'IndoorOver100', 'IndoorOver1000', 'IndoorOver50',
-       'MasksMandatoryAllSpacesPartial', 'MasksMandatoryClosedSpaces',
-       'MasksVoluntaryAllSpaces', 'MassGather50', 'MassGather50Partial',
-       'MassGatherAll', 'MassGatherAllPartial', 'NonEssentialShops',
-       'NonEssentialShopsPartial', 'OutdoorOver100', 'PlaceOfWorshipPartial',
-       'PrivateGatheringRestrictions', 'QuarantineForInternationalTravellers',
-       'QuarantineForInternationalTravellersPartial', 'RestaurantsCafes',
-       'RestaurantsCafesPartial', 'SocialCirclePartial', 'StayHomeGen',
-       'StayHomeGenPartial', 'StayHomeOrderPartial', 'Teleworking',
-       'TeleworkingPartial', 'tavg', 'tmin', 'tmax', 'prcp', 'wdir', 'wspd',
-       'wpgt', 'pres'],
-                    class_names=(['decreasing case numbers', 'increasing case numbes']), rounded=True, filled=True)
+    export_graphviz(best_model, out_file=("Covid_tree.dot"),
+                    feature_names=['day since pandemic', 'total_cases', 'new_cases_smoothed',
+                               'weekly_hosp_admissions_per_million', 'new_tests_smoothed_per_thousand',
+                               'positive_rate', 'tests_per_case', 'people_vaccinated_per_hundred',
+                               'people_fully_vaccinated_per_hundred', 'stringency_index',
+                               'BanOnAllEvents', 'BanOnAllEventsPartial', 'ClosDaycare',
+                               'ClosDaycarePartial', 'ClosPrim', 'ClosPrimPartial', 'ClosPubAny',
+                               'ClosPubAnyPartial', 'ClosSec', 'ClosSecPartial', 'EntertainmentVenues',
+                               'EntertainmentVenuesPartial', 'GymsSportsCentres',
+                               'GymsSportsCentresPartial', 'HotelsOtherAccommodationPartial',
+                               'IndoorOver100', 'IndoorOver1000', 'IndoorOver50',
+                               'MasksMandatoryAllSpacesPartial', 'MasksMandatoryClosedSpaces',
+                               'MasksVoluntaryAllSpaces', 'MassGather50', 'MassGather50Partial',
+                               'MassGatherAll', 'MassGatherAllPartial', 'NonEssentialShops',
+                               'NonEssentialShopsPartial', 'OutdoorOver100', 'PlaceOfWorshipPartial',
+                               'PrivateGatheringRestrictions', 'QuarantineForInternationalTravellers',
+                               'QuarantineForInternationalTravellersPartial', 'RestaurantsCafes',
+                               'RestaurantsCafesPartial', 'SocialCirclePartial', 'StayHomeGen',
+                               'StayHomeGenPartial', 'StayHomeOrderPartial', 'Teleworking',
+                               'TeleworkingPartial', 'tavg', 'tmin', 'tmax', 'prcp', 'wdir', 'wspd',
+                               'wpgt', 'pres'],
+                class_names=(['decreasing case numbers', 'increasing case numbes']), rounded=True, filled=True)
     os.system("dot -Tpng Covid_tree.dot -o Covid_tree.png")
     os.system("dot -Tps Covid_tree.dot -o Covid_tree.ps")
 
     # change to the start working directory
     os.chdir(path_start)
     return
+
+    # export_graphviz(best_model, out_file=("Covid_tree.dot"),  feature_names=['day since pandemic' , 'total_cases', 'new_cases', 'new_cases_smoothed',
+    #    'total_cases_per_million', 'new_cases_per_million',
+    #    'new_cases_smoothed_per_million', 'total_deaths_per_million',
+    #    'new_deaths_per_million', 'new_deaths_smoothed_per_million',
+    #    'weekly_hosp_admissions_per_million', 'new_tests_smoothed_per_thousand',
+    #    'positive_rate', 'tests_per_case', 'people_vaccinated_per_hundred',
+    #    'people_fully_vaccinated_per_hundred', 'stringency_index',
+    #    'BanOnAllEvents', 'BanOnAllEventsPartial', 'ClosDaycare',
+    #    'ClosDaycarePartial', 'ClosPrim', 'ClosPrimPartial', 'ClosPubAny',
+    #    'ClosPubAnyPartial', 'ClosSec', 'ClosSecPartial', 'EntertainmentVenues',
+    #    'EntertainmentVenuesPartial', 'GymsSportsCentres',
+    #    'GymsSportsCentresPartial', 'HotelsOtherAccommodationPartial',
+    #    'IndoorOver100', 'IndoorOver1000', 'IndoorOver50',
+    #    'MasksMandatoryAllSpacesPartial', 'MasksMandatoryClosedSpaces',
+    #    'MasksVoluntaryAllSpaces', 'MassGather50', 'MassGather50Partial',
+    #    'MassGatherAll', 'MassGatherAllPartial', 'NonEssentialShops',
+    #    'NonEssentialShopsPartial', 'OutdoorOver100', 'PlaceOfWorshipPartial',
+    #    'PrivateGatheringRestrictions', 'QuarantineForInternationalTravellers',
+    #    'QuarantineForInternationalTravellersPartial', 'RestaurantsCafes',
+    #    'RestaurantsCafesPartial', 'SocialCirclePartial', 'StayHomeGen',
+    #    'StayHomeGenPartial', 'StayHomeOrderPartial', 'Teleworking',
+    #    'TeleworkingPartial', 'tavg', 'tmin', 'tmax', 'prcp', 'wdir', 'wspd',
+    #    'wpgt', 'pres'],
+    #                 class_names=(['decreasing case numbers', 'increasing case numbes']), rounded=True, filled=True)
+    # os.system("dot -Tpng Covid_tree.dot -o Covid_tree.png")
+    # os.system("dot -Tps Covid_tree.dot -o Covid_tree.ps")
+    #
+    # # change to the start working directory
+    # os.chdir(path_start)
+    # return
 
 
 # #Old Version
