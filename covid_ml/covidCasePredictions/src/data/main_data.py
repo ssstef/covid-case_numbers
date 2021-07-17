@@ -20,6 +20,8 @@ plt.style.use('ggplot')  # Make figures pretty
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
+import Preprocessor
+from Preprocessor import leads
 
 #'In this file I build a dataset to analyse covid data'
 
@@ -258,18 +260,34 @@ df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covi
 
 # Use lead variable of reproduction rate (equals lagged values of explanatory features)
 #End up with dataset that has yesterdays explanatory variables in one row with today's (binary) reproduction rate
-number_lags = 5
-for lag in range(1, number_lags + 1):
-    df['r_kat_lag_' + str(lag)] = df.R_kat.shift(periods=-lag)
+leads(data= df, x= df.R_kat, z= 'r_kat_lead_', number=5)  # defined in Preprocessor
+
+#
+# number_leads = 5
+# for lead in range(1, number_leads + 1):
+#     df['r_kat_lead_' + str(lead)] = df.R_kat.shift(periods=-lead)
+
+# number_lags = 5
+# for lag in range(1, number_lags + 1):
+#     df['r_kat_lag_' + str(lag)] = df.R_kat.shift(periods=-lag)
 
 # Drop rows that have missing values now.
 df = df.dropna()
 
-
-
 print(df.head())
 df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead.csv')
 
+# Drop lead variables
+leadlist = [1, 2, 3, 4, 5]
+for i in leadlist:
+    df.drop(['r_kat_lead_' + str(i)], axis=1, inplace=True)
+
+df['new_cases'] = df['new_cases_smoothed']
+df.drop(['new_cases_smoothed'], axis=1, inplace=True)
+df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_cases.csv')
+
+leads(data = df, x= df.new_cases, z ='new_cases_lead_', number=5)
+df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead_cases.csv')
 
 #############################################################
 #Diesen Teil noch komplett löschen!

@@ -37,3 +37,42 @@ def dims(x):
         return np.array(x).reshape(-1, 1)
     else:
         return x
+
+
+def leads(data, x, z:str, number = 5):
+    number_leads = number
+    for lead in range(1, number_leads + 1):
+            data[z + str(lead)] = x.shift(periods=-lead)
+
+# Frage an Philipp: könnte man sowas umsetzen und falls ja: wie?
+class Split:
+    def __init__(self, X, y, n):
+        self.x = X
+        self.y = y
+        self.n = n
+
+    def get_xy(self, data, n=6):
+        X= data.iloc[:, :-n]
+        return self.X
+        print('inside function', X)
+        y = data.iloc[:, -n]
+        return self.y
+
+#def split:
+
+#         X = self.iloc[:, :-n]
+#         return X
+#         print('inside function', X)
+#         y = self.iloc[:, -n]
+#         return y
+#
+#     return self.normalize(self.X_train), self.normalize(self.X_test), self.y_train, self.y_test, self.scaler
+
+#
+# def split(self, data, n=6):
+#     self.X = data.iloc[:, :-n]
+#     return self.X
+#     self.y = data.iloc[:, -n]
+#     return self.y
+
+
