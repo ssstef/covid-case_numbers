@@ -94,8 +94,20 @@ class Classifier:
             # Random Forest
             # -----------------------
             elif self.model == 'rf':
-                # rf = RandomForestClassifier(max_depth=8, criterion="entropy", min_samples_split=9)
-                rf = RandomForestClassifier(n_estimators=100)
+                rf = RandomForestClassifier(criterion="entropy", max_depth=7, n_estimators=50, random_state=14)
+                #forrest_para = {'criterion': ['gini', 'entropy'], 'max_depth': [i for i in range(1, 20)],
+                 #               'min_samples_split': [i for i in range(2, 20)]}
+
+                # GridSearchCV --> takes for ever --> not worth it
+                #grd_rf = GridSearchCV(rf, forrest_para, cv=5)
+                #grd_rf.fit(X_train, y_train)
+
+                # Besten gefundenen RF übergeben
+                #rf_clf = grd_rf.best_estimator_  # wenn noch Zeit mit RRandom SEarch wiederholen
+
+
+                #rf_clf = RandomForestClassifier(max_depth=8, criterion="entropy", min_samples_split=9, n_estimators=80)
+                #rf = RandomForestClassifier(n_estimators=100)
                 rf.fit(X_train, y_train)
                 score = rf.score(X_test, y_test)
                 self.ergebnis.append(['random forest', score, rf])

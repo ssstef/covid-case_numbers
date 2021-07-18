@@ -13,8 +13,13 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder
 # lokal gespeichert/selbst geschrieben
+#import Preprocessor
 from Preprocessor import Preprocessor
+#from Preprocessor import Split  #delete later if not possible!
+#from Preprocessor import split #delete later!
 from Classifier import Classifier
+import Regressor
+from Regressor import Regressor
 from visualize import decision_tree
 #from visualize import confmat_plot
 from Classifier import correlation
@@ -31,44 +36,81 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 
-import matplotlib.pyplot as plt
-from sklearn.metrics import plot_confusion_matrix
+#import matplotlib.pyplot as plt
+#from sklearn.metrics import plot_confusion_matrix
 
+# Regressors
+from sklearn.model_selection import cross_val_score
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.ensemble import RandomForestRegressor
+import visualize
+from visualize import decision_tree
+from sklearn.datasets import make_regression
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn import svm
+from sklearn.ensemble import AdaBoostRegressor
+# Voting
+
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import VotingRegressor
+
+# Neural Network
+from sklearn.neural_network import MLPRegressor
+
+
+################################################################################################################
+# Load data, name output categories
 df = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead.csv')  #join1 klappt !!
 class_names = ['decreasing covid cases', 'increasing covid cases']
 
 # Save correlation matrix
-high_correlation(data=df)
+#high_correlation(data=df)  # delete later (didn't really do anything)
 #correlation(data=df)
 
 print(df.head())
 
-# To use R_kat --> to predict today's reproduction rate
-#X = df.loc[:, df.columns != 'R_kat']
-X = df.iloc[:, :-6]
-y = df["R_kat"]
-# To predict tomorrow's reproduction rate
-X = df.iloc[:, :-6]
-y = df['r_kat_lag_5']
-# To predict reproduction ratet 5 days from now
+################################################################################################################
+# Split data into features(X) and target(y)
+# put in 1 to predict today's values, 2 for tomorrow's...up to 6 for 5 days after current day
+#split(data=df, n=6)
+# function not possible so:
+# Change number tto 1 to predict today's case numbers, 2 for tomorrow's and so on up to 5 for 5 days in the future
+number = int(6)
+X = df.iloc[:, :-number]
+y = df.iloc[:, -number]
+
+
+
+# To use R_kat -->  predict today's reproduction rate
+#
+# X = df.iloc[:, :-6]
+# y = df.iloc[:, -6]
+# # To predict reproduction rate 5 days from now
+# X = df.iloc[:, :-1]
+# y = df.iloc[:, -1]
+#y = df[:, 'r_kat_lag_5']
+
 
 X_train, X_test, y_train, y_test, scaler = Preprocessor(X, y).get_data()
 
+print('Preprocessor worked?')
 
 # Models spezifieren
 models = {"rf": RandomForestClassifier, "dt": DecisionTreeClassifier, "knn": KNeighborsClassifier, "svm": SVC,
           "mlp": MLPClassifier, "ada": AdaBoostClassifier, } #"voting": VotingClassifier
 
 # Classifier verwenden
-clf = Classifier()
-resultat = clf.train_models(X_train, X_test, y_train, y_test, models)
+# clf = Classifier()
+# resultat = clf.train_models(X_train, X_test, y_train, y_test, models)
 
 # Bestes Ergebnis bestimmen und als Modell speichern
-print("Bestes Model ist: {} mit einer Akkuranz von {}%".format(sorted(resultat, key=itemgetter(1), reverse=True)[0][0],
-                                                               sorted(resultat, key=itemgetter(1), reverse=True)[0][
-                                                                   1] * 100))
-bestes_model = sorted(resultat, key=itemgetter(1), reverse=True)[0][2]
-print("Alle Ergebnisse: {}".format(resultat))
+# print("Bestes Model ist: {} mit einer Akkuranz von {}%".format(sorted(resultat, key=itemgetter(1), reverse=True)[0][0],
+#                                                                sorted(resultat, key=itemgetter(1), reverse=True)[0][
+#                                                                    1] * 100))
+# bestes_model = sorted(resultat, key=itemgetter(1), reverse=True)[0][2]
+# print("Alle Ergebnisse: {}".format(resultat))
 
 #Confusion Matrix für das beste Modell ausgeben
 np.set_printoptions(precision=2)
@@ -129,3 +171,32 @@ random_search.fit(X_test, y_test)
 report(random_search.cv_results_)
 
 
+#### Train regresssion
+# load dataset
+df = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead_cases.csv')  #join1 klappt !!
+#dataset = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead_cases.csv', header=0, index_col=0)
+################################################################################################################
+# Change number tto 1 to predict today's case numbers, 2 for tomorrow's and so on up to 5 for 5 days in the future
+# number = int(6) (defined above)
+X = df.iloc[:, :-number]
+y = df.iloc[:, -number]
+
+################################################################################################################
+
+X_train, X_test, y_train, y_test, scaler = Preprocessor(X, y).get_data()
+
+# Models spezifieren
+models = {"rf": RandomForestRegressor, "dt": DecisionTreeRegressor, "knn": KNeighborsRegressor, "svm": SVC,
+          "mlp": MLPRegressor, "ada": AdaBoostClassifier, 'voting': VotingRegressor } #"voting": VotingClassifier
+
+# Regressor verwenden
+
+reg = Regressor()
+resultat = reg.train_models(X_train, X_test, y_train, y_test, models)
+
+# Bestes Ergebnis bestimmen und als Modell speichern
+print("Bestes Model ist: {} mit einem R-Quadrat von {}".format(sorted(resultat, key=itemgetter(1), reverse=True)[0][0],
+                                                               sorted(resultat, key=itemgetter(1), reverse=True)[0][
+                                                                   1] ))
+bestes_model = sorted(resultat, key=itemgetter(1), reverse=True)[0][2]
+print("Alle Ergebnisse: {}".format(resultat))

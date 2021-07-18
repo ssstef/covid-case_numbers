@@ -1,37 +1,23 @@
 # Import modules
 
-import os
 import sys
 sys.path.append("src/models/")
 sys.path.append("src/data/")
 sys.path.append("src/visualization/")
 
+
 # Warum lässt sich das hier nicht importieren?!
+# lokal gespeichert/selbst geschrieben und in train.py funktioniert es
 # lokal gespeichert/selbst geschrieben
-from Preprocessor import Preprocessor
-from Classifier import Classifier
-from visualize import decision_tree
+#from Preprocessor import Preprocessor
 #from visualize import confmat_plot
-from Classifier import correlation
-
-
-from datetime import date, datetime
-
-import pandas as pd
-from covid_ml.covidCasePredictions.src.features.build_features import *
+import Classifier
 import matplotlib.pyplot as plt  # plotting
-import numpy as np  # linear algebra
-import os  # accessing directory structure
 import pandas as pd  # data processing
-import seaborn as sns
-import numpy as np
-from sklearn.preprocessing import OneHotEncoder
+
 plt.style.use('ggplot')  # Make figures pretty
 #To preprocess data
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
 #import Classifier
-from Classifier import Classifier
 from Classifier import correlation
 
 print('In this file I do descriptive analyses on the covid data generated in main_data')
@@ -210,7 +196,6 @@ correlation(data=data)
 
 # Remember for later projects
 # To set up project structure using coockie cutter
-from cookiecutter.main import cookiecutter
 # doch nicht verwendetcookiecutter https://gitlab.com/ericdevost/cookiecutter-python.git
 # cookiecutter -c v1 https://github.com/drivendata/cookiecutter-data-science
 

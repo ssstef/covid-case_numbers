@@ -20,6 +20,8 @@ plt.style.use('ggplot')  # Make figures pretty
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
+import Preprocessor
+from Preprocessor import leads
 
 #'In this file I build a dataset to analyse covid data'
 
@@ -241,8 +243,12 @@ df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covi
 #new_tests_smoothed_per_thousand already in dataset
 #weekly_hosp_admissions_per_million in data
 df.drop(['new_vaccinations_smoothed_per_million', 'excess_mortality', 'new_vaccinations' ,	'new_vaccinations_smoothed' , 'total_vaccinations_per_hundred', 'total_vaccinations', 'people_vaccinated' , 'people_fully_vaccinated' , 'total_tests' , 'total_tests_per_thousand' ,'new_tests_smoothed', 'weekly_hosp_admissions'], axis=1, inplace=True)
-#Delete when predicting cases, not if trying to predict deaths!
-df.drop(['icu_patients' ,'icu_patients_per_million', 'total_deaths', 'new_deaths' ,	'new_deaths_smoothed' ], axis=1, inplace=True)
+# Also delete
+# new_cases: keep only smoothed, total_cases_per_million: keep only total, new_deaths_smoothed_per_million (keep non smoothed)
+df.drop(['new_cases', 'total_cases_per_million', 'new_cases_per_million', 'new_cases_smoothed_per_million', 'new_deaths_smoothed_per_million'], axis=1, inplace=True)
+#Delete when predicting cases, not if trying to predict deaths! Then keep one for hospitalization, one fo deaths
+df.drop(['icu_patients' ,'icu_patients_per_million', 'total_deaths', 'new_deaths' ,	'new_deaths_smoothed', 'total_deaths_per_million', 'new_deaths_per_million'], axis=1, inplace=True)
+# Delete more because too many variables, some quiet correlated
 
 
 columns_df = df.columns
@@ -254,18 +260,34 @@ df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covi
 
 # Use lead variable of reproduction rate (equals lagged values of explanatory features)
 #End up with dataset that has yesterdays explanatory variables in one row with today's (binary) reproduction rate
-number_lags = 5
-for lag in range(1, number_lags + 1):
-    df['r_kat_lag_' + str(lag)] = df.R_kat.shift(periods=-lag)
+leads(data= df, x= df.R_kat, z= 'r_kat_lead_', number=5)  # defined in Preprocessor
+
+#
+# number_leads = 5
+# for lead in range(1, number_leads + 1):
+#     df['r_kat_lead_' + str(lead)] = df.R_kat.shift(periods=-lead)
+
+# number_lags = 5
+# for lag in range(1, number_lags + 1):
+#     df['r_kat_lag_' + str(lag)] = df.R_kat.shift(periods=-lag)
 
 # Drop rows that have missing values now.
 df = df.dropna()
 
-
-
 print(df.head())
 df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead.csv')
 
+# Drop lead variables
+leadlist = [1, 2, 3, 4, 5]
+for i in leadlist:
+    df.drop(['r_kat_lead_' + str(i)], axis=1, inplace=True)
+
+df['new_cases'] = df['new_cases_smoothed']
+df.drop(['new_cases_smoothed'], axis=1, inplace=True)
+df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_cases.csv')
+
+leads(data = df, x= df.new_cases, z ='new_cases_lead_', number=5)
+df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead_cases.csv')
 
 #############################################################
 #Diesen Teil noch komplett löschen!
