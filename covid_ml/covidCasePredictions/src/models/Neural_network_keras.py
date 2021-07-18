@@ -63,13 +63,14 @@ scaled = scaler.fit_transform(values)
 print('Before reframe', dataset.head())
 
 # frame as supervised learning
+# Use 5 lags for all features, no leads (don't use future but past to predict the future cases)
 reframed = series_to_supervised(scaled, 5, 1)
 
 
-# drop columns we don't want to predict
 # I dropped the columns I don't want to predict or use for prediction in main_data.py
+# drop columns we don't want to predict
 #reframed.drop(reframed.columns[[9, 10, 11, 12, 13, 14, 15]], axis=1, inplace=True)
-print('Reframed, 1,5', reframed.head())
+print('Reframed, 5, 1', reframed.head())
 
 # split into train and test sets
 values = reframed.values
@@ -80,7 +81,7 @@ n_test_days = 526
 train = values[:n_train_days, :]
 test = values[n_train_days:n_test_days, :]
 #Also create subset to predict the y value  !! delete actual values?!
-prediction = values[n_test_days: , :]
+prediction = values[n_test_days: , :]  # now empty...
 # split into input and outputs
 # added for final model  --> came up with better solution, see above
 # values_pandas = pd.DataFrame(values)
@@ -122,12 +123,14 @@ no_classes = 1 # put output into 10 classes (does this make sense?!)
 
 model = Sequential()
 model.add(LSTM(60, input_shape=(train_X.shape[1], train_X.shape[2])))  # added activation = relu
-# model.add(LSTM(50, input_shape=(train_X.shape[1], train_X.shape[2]), activation='relu'))  # added activation = relu
-#model.add(LSTM(128))
-#model.add(MaxPooling2D(pool_size=(4, 50)))  # added this line (does this pool_size make any sense?!
+###### model.add(LSTM(50, input_shape=(train_X.shape[1], train_X.shape[2]), activation='relu'))  # added activation = relu
+#####model.add(LSTM(128))
+######model.add(MaxPooling2D(pool_size=(4, 50)))  # added this line (does this pool_size make any sense?!
 model.add(Dense(1))
-#model.add(Dense(no_classes, activation='softmax'))  ## added this(end with softmax...)
-model.compile(loss='mae', optimizer='adam')
+#######model.add(Dense(no_classes, activation='softmax'))  ## added this(end with softmax...) destroys the entire model..
+model.compile(loss='mae', optimizer='adam', metrics=['accuracy'] )
+#model.compile(loss='mae', optimizer='adam')  ##this woks
+metrics=['accuracy']
 # fit network
 history = model.fit(train_X, train_y, epochs=50, batch_size=72, validation_data=(test_X, test_y), verbose=2,
                     shuffle=False)
@@ -216,8 +219,8 @@ history = model.fit(X_reshaped, y, epochs=250, batch_size=72, verbose=2,
 # Save model (to use for predictions later)
 from keras.models import load_model
 
-model.save('my_model2.h5')  # creates a HDF5 file 'my_model.h5'
-del model  # deletes the existing model
+#model.save('my_model2.h5')  # creates a HDF5 file 'my_model.h5'
+#del model  # deletes the existing model
 
 
 
@@ -256,8 +259,3 @@ pyplot.savefig('y and yhat entire dataset')
 # identical to the previous one
 #model = load_model('my_model.h5')
 #model.predict()
-
-#Probably delete later; other way to build the model
-#model = tflearn.DNN(lstm_model(n_classes, input_vec_size))
-#model.fit(train_x, train_y, validation_set=(test_x, test_y), n_epoch=20,
-#          show_metric=True, snapshot_epoch=True, run_id='lstm_model')

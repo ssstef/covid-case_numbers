@@ -84,7 +84,7 @@ class Regressor:
                 dt.fit(X_train, y_train)
 
                 # Decision Tree ausgeben (wenn Zeit besten Tree suchen und den ausgeben!=
-                decision_tree_reg(best_model=dt, X=X_test)
+               # decision_tree_reg(best_model=dt, X=X_test) auskommentiert weil der unveränderte Befehl plötzlich Fehler ausgiebt:ValueError: Length of feature_names, 56 does not match number of features, 57 Ich füge eins hinzu: ValueError: Length of feature_names, 58 does not match number of features, 57)
 
                 score = dt.score(X_test, y_test)
                 self.ergebnis.append(['decision tree', score, dt])
