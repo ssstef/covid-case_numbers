@@ -2,8 +2,10 @@
 from datetime import date, datetime
 import os
 import sys
-sys.path.append("src/models/")
-sys.path.append("src/data/")
+#sys.path.append("src/models/")
+#sys.path.append("src/data/")
+#sys.path.append("../data/")
+#sys.path.append("data/..")
 import pandas as pd
 import plotly as plotly
 
@@ -23,19 +25,25 @@ from sklearn.preprocessing import MinMaxScaler
 import Preprocessor
 from Preprocessor import leads
 
-#'In this file I build a dataset to analyse covid data'
+#'In this file I build datasets to analyse covid data'
+# I build datasets for traditional machine learning - one to analyse a binary target variable: cases increasing or decreasing and one to predict case numbers
+# Additionally I build a dataset to perform Deep Learning (LSTM)
+# The main difference is the date structure and added lags/leads
+# I use three data sources: weather, measures against Covid and a covid dataset including a vast number of statistics on cases, hospitalization, tests...some of these are highly correlated which is why I choose a subset of these
 
-df_weather = pd.read_excel('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/external/weather_data3.xlsx')
+####################################################################################################
+# First I load weather data and set the tiime variable as index to  merge on this later
+# The weather data gets downloaded in get_weather_data.py in the daat folder.
+#df_weather = pd.read_excel('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/external/weather_data3.xlsx')
+# In case this doesn't work just use line above
+df_weather = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/interim/weather_data2.csv')
+print(df_weather.shape)
 
-print(df_weather.head())
-print('works till here?')
-
-
-# Neue Column Namen
-df_weather.rename(columns=df_weather.iloc[0])
-new_header = df_weather.iloc[0] #grab the first row for the header
-df_weather = df_weather[1:] #take the data less the header row
-df_weather.columns = new_header #set the header row as the df header
+# Add Column names -- is this sttill necessary?
+# df_weather.rename(columns=df_weather.iloc[0])
+# new_header = df_weather.iloc[0]      #grab the first row for the header
+# df_weather = df_weather[1:]          #take the data less the header row
+# df_weather.columns = new_header      #set the header row as the df header
 
 df_weather.set_index(df_weather['time'], inplace=True)  #!! eventuell wieder rein
 print('is time now index?')
@@ -45,16 +53,17 @@ print('is time now index?')
 #df_weather['Date'] = floor_date.df_weather['time']
 # Change date forrmat to match other datasets
 #df_weather['just_date'] = df_weather['date'].dt.date nope
+
 print('inspect weather data for Berlin')
 print(df_weather.head())
 
 # also save in csv file
 df_weather.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/external/weather_data.csv')
 
-print('Data on measuers')
+####################################################################################################
+# Then I load measures data and set the time variable as index to  merge on this later
 df_measures = pd.read_excel('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/external/response_graphs_data_2021-06-09.xlsx')
-print(df_measures.head)
-
+print('Data on measuers', df_measures.head)
 
 # Drop Country as only Germany is included
 df_measures.drop(['Country'], axis=1, inplace=True)
@@ -67,6 +76,7 @@ print(col_mapping_dict_measures)
 #col_names = []
 
 # fill in nan in end_date with latest date of  downloaded data: 2021-06-10
+# measures with no end date are still in effect, this way they will be coded as yes in the Dummy variable after processing
 df_measures.fillna('2021-06-10', inplace=True)
 print(df_measures.head())
 
@@ -78,67 +88,64 @@ df_m = (
     df_measures.explode("date", ignore_index=True)
     .drop(columns=["date_start", "date_end"])
 )
-print('what happened to the data?')
+
 # Datensatz komplett anschauen (150 Zeilen)
 pd.set_option("display.max_rows", 150, "display.max_columns", None)
-print(df_m)
+print('what happened to the data?', df_m.head())
 
 # Add column indicating measure is active at given date
 # add column of ones (for active measures)
 active = np.ones(6355)
 df_m['Active'] = active
-print('print shape')
+print('print shape before pivot', df_m.shape)
 
 
 #print('pivot to allow merging datasets later')
+# The active colum of ones is NaN when ther
 df_m2=df_m.pivot(index='date', columns='Response_measure')
-print(df_m2.shape)
-print(df_m2.head())
-print('head dfm2')
+print('head dfm2', df_m2.head() )
 
-
-print('print shape')
+print('print shape after pivot', df_m2.shape)
 
 df_m2.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/response_graphs_pivot.csv')
 
 df_m2 = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/external/response_graphs_pivot_3.csv', sep=';')
 
-print('see all columns')
-print(df_m)
-print('df_m2 kopf angepasst')
-print(df_m2.head())
-# Set date as index
+print('see all columns', df_m)
+
+print('df_m2 kopf angepasst', df_m2.head())
+
+# Set date as index (is already index)
 #df_m.set_index(df_m['date'], inplace=True)  !! eventuell wieder rein
-print('date now index?')
-print(df_m.head())
+print('date now index?', df_m.head())
+
 df_m.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/response_graphs_reshaped_date_index.csv')
 
-print('In this file I analyse covid data')
+####################################################################################################
+# Third I load covid data and set the time variable as index to  merge on this later
+####################################################################################################
 # use read_excel to read part of larger dataset more quickly
-# Open and inspect data
-#All countries
-#df = pd.read_excel('covid_ml/covidCasePredictions/data/external/owid-covid-data.xlsx', sheet_name=0)
-
-#Only Germany (only date and numerical data)
+# df = read_excel('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/external/owid-covid-data.xlsx', nrows=150)
+# then use pandas Dataframe
+# df = pd.DataFrame(df)
+####################################################################################################
+#Only Germany (only includes date and numerical data)
 df = pd.read_excel('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/external/owid-covid-data-Germany-num.xlsx', sheet_name=0)
-# drop empty columns (no information for Germany)
-print(df.shape)
+#drop information I don't need fo ranalyses
+
+# drop empty columns (no information in these columns for Germany)
+print('Head original df', df.shape)
 df = df.dropna(axis='columns', how='all')
-print(df.shape)
-print(df.head())
-print('Columns dropped?')
+print('Shape', df.shape)
+print('Head after dropping nan columns', df.head())
+
 # fill in weekly infomation with last valid information (use weekly information fo the following week up to the next valid value
 ##!! not always a good measure! have to choose where to use this method via looking at the information!
 df.fillna(method="ffill", inplace=True)
 #Fill in the rest of the values with 0 (I have to do this more selectively later on!!)
 df.fillna(0, inplace=True)
-#use subset of data
-#Quicker way to read subset of large dataset
-#df = read_excel('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/external/owid-covid-data.xlsx', nrows=150)
 
-#df = read_excel('covid_ml/covidCasePredictions/data/external/owid-covid-data.xlsx', nrows=150)
-# use pandas Dataframe
-#df = pd.DataFrame(df)
+
 
 # Datensatz komplett anschauen
 pd.set_option("display.max_rows", None, "display.max_columns", None)
@@ -158,8 +165,10 @@ print(col_mapping_dict)
 #df['date'] = pd.to_datetime(df['date'])  # , format='%Y%m%d'
 # Set date as index
 df.set_index(df['date'], inplace=True) #!! eventuell wieder rein
-print(df_m2.head())
+
 #df_m2.set_index(df_m2['date'], inplace=True)
+# Also set index of measurers data to Date
+print('Measures data', df_m2.head())
 df_m2.set_index('Date', inplace= True)
 
 print('is date now index?')
@@ -168,41 +177,38 @@ print(df_m2.head())
 #Pivot to allow for joining the datasets
 
 
-# Join datasets
-# Join datasets
+####################################################################################################
+# The fourth main step of my data preparation is to join all three data sources together.
+
 #result = pd.concat([df, df_m], axis=1)
 #result = pd.concat([df, df_m2, df_weather], axis=1)  # join data on measures with owid data
 #result_prep = df.join(df_m2)
 #result = result_prep.join(df_weather)
+####################################################################################################
+
+# Join datasets
 result_prep = df.join(df_m2)  #, how='left', lsuffix='_left', rsuffix='_right')
 result = result_prep.join(df_weather)
 
-print('HIER !?')
-print(result.head())
+print('Head merged datasets', result.head())
 
-print('did join work?')
-# result = pd.concat([df, df_m2], axis=1) #
-print('hier sind die ERgebnisse')
-print(result.head())
 result.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join4.csv')
 
+####################################################################################################
+# For binary analyses I creratet R_kat which is 1 if cases are increasng and 0 if they are decreasing
 result['R_kat'] = np.where(result['reproduction_rate'] < 1, 0, 1)
 print(result[['R_kat','reproduction_rate']])
-
+# I drop the reproduction rate becaue it is by nature perfectly collinar with R_kat
 result.drop(['reproduction_rate'], axis=1, inplace=True)
 result.drop(['date'], axis=1, inplace=True)
 # rename new index column
 df.rename(columns={"Unnamed: 0" : "days since pandemic"}, inplace=True)  ##df.rename(columns={ df.columns[1]: "your value" }, inplace = True)
+# I drop some non-numerical data I don't neccassarily need
 result.drop(['time'], axis=1, inplace=True)
 result.drop(['tests_units'], axis=1, inplace=True)
 
-#result['R_kat'] = 0 if result['reproduction_rate'] < 1 else 1
-#result['R_kat'] = result['reproduction_rate'>=1==1, 'reproduction_rate'<1 ==0]
-#Fill in the rest of the values with 0 (I have to do this more selectively later on!!)
-df.fillna(0, inplace=True)
+#Fill in the rest of the values with 0_ this is intuitively useful for the data at hand; without time restrictions I might chosse other procedures
 
-print(df.head())
-#Also save data in csv®
 
 # Fill all remaining missing values with 0 (plausible for first part
 result.fillna(0, inplace=True)
@@ -211,18 +217,25 @@ result.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/
 # Für erste Analysen ohne Datumsangabe
 result.reset_index(drop=True, inplace=True)
 
-# Drop columns without variance  --> ab jetzt mit df als endgültigem Dataframe arbeiten.
+# Drop columns without variance  --> ab jetzt mit df als endgültigem Dataframe arbeiten. Drop if only one unique value
 df = pd.DataFrame(result)
 print('shape before', df.shape)
 df=df[[i for i in df if len(set(df[i]))>1]]
 print('shape after', df.shape)
 
+# Other way to achieve this did not work as intended
 #Drop inplace
 # print('shape before', df.shape)
 # for col in df.columns:
 #    if len(df[col].unique()) == 1:
 #       df.drop(col,inplace=True,axis=1)
 # print('shape after', df.shape)
+
+# (I have to do this more selectively later on!!)
+df.fillna(0, inplace=True)
+print(df.head())
+
+
 
 
 # Liste der Spalten
@@ -233,7 +246,7 @@ print('shape after', df.shape)
 #print('Column names', columns_join1)  # I use the column names for figures and copy them into visualize.py; more elegant solution coming later
 
 columns_df = df.columns
-print('Column names after drop', columns_df)  # I use the column names for figures and copy them into visualize.py; more elegant solution coming later
+print('Column names after drop', columns_df)  # I use the column names for figures and copy them into visualize.py; more elegant solution did not work
 
 df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join1_old.csv')
 
@@ -257,12 +270,16 @@ print('Column names after drop', columns_df)  # I use the column names for figur
 #'überschreibt ursprünglichen Analysedatensatz
 df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join1.csv')
 
-
+####################################################################################################
+# To make use of the time series format I create lead and lag variables that differ for traditional machine learning and the LSTM model
+####################################################################################################
+# First I prepare data for traditional machine learning
+####################################################################################################
 # Use lead variable of reproduction rate (equals lagged values of explanatory features)
-#End up with dataset that has yesterdays explanatory variables in one row with today's (binary) reproduction rate
+#End up with dataset that has yesterdays (and up to 5 days in the past) explanatory variables in one row with today's (binary) reproduction rate
 leads(data= df, x= df.R_kat, z= 'r_kat_lead_', number=5)  # defined in Preprocessor
 
-#
+#Thisi s how I tried this without the function; delete later
 # number_leads = 5
 # for lead in range(1, number_leads + 1):
 #     df['r_kat_lead_' + str(lead)] = df.R_kat.shift(periods=-lead)
@@ -271,26 +288,142 @@ leads(data= df, x= df.R_kat, z= 'r_kat_lead_', number=5)  # defined in Preproces
 # for lag in range(1, number_lags + 1):
 #     df['r_kat_lag_' + str(lag)] = df.R_kat.shift(periods=-lag)
 
-# Drop rows that have missing values now.
+# Drop rows that have missing values now. Those that cannot use lead/lag variables at beginning/end of datsaet
 df = df.dropna()
 
 print(df.head())
+
+####################################################################################################
+# Here I save the analysis data for the Classification analyses
+####################################################################################################
+
 df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead.csv')
 
+####################################################################################################
+#For regression analysese I drop lead caategorical variables and crerate them for the case numbes
+####################################################################################################
 # Drop lead variables
 leadlist = [1, 2, 3, 4, 5]
 for i in leadlist:
     df.drop(['r_kat_lead_' + str(i)], axis=1, inplace=True)
 
+# I basically rename new cases smoothed to new cases and put it at the right hand side of the dataset
 df['new_cases'] = df['new_cases_smoothed']
 df.drop(['new_cases_smoothed'], axis=1, inplace=True)
+
+####################################################################################################
+# Here I save data before adding leads which I only use for traditional machine learning
+####################################################################################################
 df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_cases.csv')
 
+
+# Here I crate up to five leads of new cases, the function is defined in Preprocessor under src/data
 leads(data = df, x= df.new_cases, z ='new_cases_lead_', number=5)
+
+####################################################################################################
+# Here I save thte analysis data for regression analyses
+####################################################################################################
 df.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead_cases.csv')
 
+
+####################################################################################################
+####################################################################################################
+#Data preparation for Deep Learnng using Pytorch
+####################################################################################################
+# I start with information without leads and with date as index
+df = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join4.csv')
+print('1_how does head look for deep learning', df.head())
+df.drop(['tests_units'], axis=1, inplace=True)
+df.drop(['reproduction_rate'], axis=1, inplace=True) ##(weil ich sie auch in anderen Analysen nicht verwende)
+# Fill all remaining missing values with 0 (plausible for first part
+df.fillna(0, inplace=True)
+#result.drop(['date'], axis=1, inplace=True) # möglicherweise, weil es auch schon der Index ist.
+# Drop columns without variance  --> ab jetzt mit df als endgültigem Dataframe arbeiten. Drop if only one unique value
+print('shape before', df.shape)
+df=df[[i for i in df if len(set(df[i]))>1]]
+print('shape after', df.shape)
+df.fillna(0, inplace=True)
+print('how does head look for deep learning', df.head())
+
+#weekly_hosp_admissions_per_million in data
+df.drop(['new_vaccinations_smoothed_per_million', 'excess_mortality', 'new_vaccinations' ,	'new_vaccinations_smoothed' , 'total_vaccinations_per_hundred', 'total_vaccinations', 'people_vaccinated' , 'people_fully_vaccinated' , 'total_tests' , 'total_tests_per_thousand' ,'new_tests_smoothed', 'weekly_hosp_admissions'], axis=1, inplace=True)
+# Also delete
+# new_cases: keep only smoothed, total_cases_per_million: keep only total, new_deaths_smoothed_per_million (keep non smoothed)
+df.drop(['new_cases', 'total_cases_per_million', 'new_cases_per_million', 'new_cases_smoothed_per_million', 'new_deaths_smoothed_per_million'], axis=1, inplace=True)
+#Delete when predicting cases, not if trying to predict deaths! Then keep one for hospitalization, one fo deaths
+df.drop(['icu_patients' ,'icu_patients_per_million', 'total_deaths', 'new_deaths' ,	'new_deaths_smoothed', 'total_deaths_per_million', 'new_deaths_per_million'], axis=1, inplace=True)
+# Delete more because too many variables, some quiet correlated
+# Drop one of the two date variables
+#df.drop(df.columns[[1]], axis = 1, inplace = True)
+#df = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_cases.csv', header=0, index_col=0)
+
+# Set date as index
+df.set_index(df['date'], inplace=True)
+print('date now index=', df.head())
+# drop date in colum
+#df.drop(['date', 'time'], axis=1, inplace=True)
+print('what type is time?', type(df.time))
+time2 = df['time']
+print('what type is time2?', type(time2))
+print('date still index=', df.head())
+
+# date
+#print('Date :',df.index.date()) ##AttributeError: 'Index' object has no attribute 'date'
+print('what type is date?', type(df.index))
+
+# Assign time features
+df_features = (
+                df
+                .assign(day = df.index.day)
+                .assign(month = df.index.month)
+                .assign(day_of_week = df.index.dayofweek)
+                .assign(week_of_year = df.index.week)
+              )
+
+####################This is where I can't go any further unfortunately
+#df = df.set_index(['Datetime'])
+#df.index = pd.to_datetime(df.index)
+#df.index = df[0]
+if not df.index.is_monotonic:
+    df = df.sort_index()
+    df = df.sort_index()
+print('how does head look after setting index?', df.head()) #--> Did not work at all, Philipp fragen, erstmal nicht ins Projekt aufnehmen
+#df = df.rename(columns={'PJME_MW': 'value'})
+#plot_dataset(df, title='PJM East (PJME) Region: estimated energy consumption in Megawatts (MW)')
+# Use easier way to create lags of all variables
+from datatable import dt, f, by
+DT = dt.Datatable(df)
+#DT[, unlist(lapply(.SD, shift, n = 0:3), recursive = FALSE)]
+
+# First I generate time lags for all fetures
+def generate_time_lags(df, n_lags):
+    feature_list = list(df.columns)
+    print(feature_list)
+    df_n = df.copy()
+    for feat in feature_list:
+        for n in range(1, n_lags + 1):
+            df_n[f"str(feat) + _lag{n}"] = df_n[str(feat)].shift(n)
+        df_n = df_n.iloc[n_lags:]
+        return df_n
+
+
+#input_dim = 100
+
+input_dim = 10
+df_generated = generate_time_lags(df, input_dim)
+df_generated
+print(df_generated.head())
+print('did anything happen?')
+
+
+
+
+
+
+
+
 #############################################################
-#Diesen Teil noch komplett löschen!
+#Diesen Teil kann man komplett löschen.
 #############################################################
 
 #df = pd.DataFrame(df, index=date) #kann weg?

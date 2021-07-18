@@ -81,7 +81,7 @@ class Classifier:
                 dt_clf = grd_clf.best_estimator_
 
                 #Besten gefundenen Decision Tree ausgeben
-                decision_tree(best_model = dt_clf, X = X_test)
+               # decision_tree(best_model = dt_clf, X = X_test); auskommentiert weil der unveränderte Befehl plötzlich Fehler ausgiebt:ValueError: Length of feature_names, 56 does not match number of features, 57 Ich füge eins hinzu: ValueError: Length of feature_names, 58 does not match number of features, 57)
 
                 score = dt_clf.score(X_test, y_test)
                 self.ergebnis.append(['decision tree', score, dt_clf])
