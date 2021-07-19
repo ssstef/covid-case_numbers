@@ -28,12 +28,12 @@ def plot_dataset(df, title):
     #plt.show(fig)
 
 
-df= pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join1.csv')
+df= pd.read_csv('/covid_ml/covidCasePredictions/data/processed/join1.csv')
 plot_dataset(df=df, title='First plot')
 
 import pandas as pd
 
-df = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join1.csv')
+df = pd.read_csv('/covid_ml/covidCasePredictions/data/processed/join1.csv')
 
 #df = df.set_index(['Datetime'])
 #df.index = pd.to_datetime(df.index)

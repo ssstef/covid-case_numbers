@@ -45,7 +45,7 @@ dataset = read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covi
 # dataset.to_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_cases.csv')
 
 #load new dataset and start with actual analyses
-dataset = read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_cases.csv', header=0, index_col=0)
+#dataset = read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_cases.csv', header=0, index_col=0)
 ################################################################################################################
 #values = dataset.values
 values = dataset.to_numpy()
@@ -55,16 +55,16 @@ encoder = LabelEncoder()
 
 # ensure all data is float
 values = values.astype('float32')
+
 # normalize features
 scaler = MinMaxScaler(feature_range=(0, 1))
-
 scaled = scaler.fit_transform(values)
 
 print('Before reframe', dataset.head())
 
 # frame as supervised learning
 # Use 5 lags for all features, no leads (don't use future but past to predict the future cases)
-reframed = series_to_supervised(scaled, 5, 1)
+reframed = series_to_supervised(scaled, 5, 1) # this is defined in nn_functions
 
 
 # I dropped the columns I don't want to predict or use for prediction in main_data.py
@@ -132,7 +132,7 @@ model.compile(loss='mae', optimizer='adam', metrics=['accuracy'] )
 #model.compile(loss='mae', optimizer='adam')  ##this woks
 metrics=['accuracy']
 # fit network
-history = model.fit(train_X, train_y, epochs=50, batch_size=72, validation_data=(test_X, test_y), verbose=2,
+history = model.fit(train_X, train_y, epochs=90, batch_size=72, validation_data=(test_X, test_y), verbose=2,
                     shuffle=False)
 
 
@@ -152,13 +152,18 @@ history = model.fit(train_X, train_y, epochs=50, batch_size=72, validation_data=
 # model.add(Dense(256, activation='relu'))
 # model.add(Dense(no_classes, activation='softmax'))
 
+path_start = os.getcwd()
+pathr = os.path.dirname(os.getcwd()) + '/../reports/figures'
+os.chdir(pathr)
 
 
 # plot history
 pyplot.plot(history.history['loss'], label='train')
 pyplot.plot(history.history['val_loss'], label='test')
 pyplot.legend()
+pyplot.savefig('nn_loss_test.png')
 pyplot.show()
+
 
 # make a prediction
 yhat = model.predict(test_X)
@@ -177,7 +182,9 @@ inv_y = pred_scaler.inverse_transform(test_y)
 pyplot.plot(inv_y, label='yhat Test')
 pyplot.plot(inv_yhat, label='y Test')
 pyplot.legend()
+pyplot.savefig('nn_prediction_test.png')
 pyplot.show()
+
 
 # Delte this later!
 # # invert scaling for forecast
@@ -210,7 +217,7 @@ model.add(LSTM(50, input_shape=(X_reshaped.shape[1], X_reshaped.shape[2])))
 model.add(Dense(1))
 model.compile(loss='mae', optimizer='adam')
 # fit network
-history = model.fit(X_reshaped, y, epochs=250, batch_size=72, verbose=2,
+history = model.fit(X_reshaped, y, epochs=90, batch_size=72, verbose=2,
                     shuffle=False)
 
 
@@ -241,6 +248,7 @@ inv_y = pred_scaler.inverse_transform(y)
 pyplot.plot(inv_y, label='yhat')
 pyplot.plot(inv_yhat, label='y')
 pyplot.legend()
+pyplot.savefig('nn_prediction_entire_model.png')
 pyplot.show()
 
 
@@ -259,3 +267,4 @@ pyplot.savefig('y and yhat entire dataset')
 # identical to the previous one
 #model = load_model('my_model.h5')
 #model.predict()
+os.chdir(path_start)

@@ -113,7 +113,7 @@ def decision_tree(best_model, X):
                                      'wdir',
                                      'wspd',
                                      'wpgt',
-                                     'pres',],
+                                     'pres'],
                 class_names=(['decreasing case numbers', 'increasing case numbes']), rounded=True, filled=True)
     os.system("dot -Tpng Covid_tree.dot -o Covid_tree.png")
     os.system("dot -Tps Covid_tree.dot -o Covid_tree.ps")
@@ -287,7 +287,15 @@ def correlation(data):
     )
 
 
+import seaborn as sns
+#Korrelationen der Eingangsvariablen erkennen
+corr_matrix = daten.corr()
 
+plt.figure(figsize=(20, 20))
+sns.set(font_scale=0.7)
+heatmap = sns.heatmap(corr_matrix, vmin=-1, vmax=1, annot=True, fmt='.3f', linewidths=.1)
+heatmap.set_title('Correlation Heatmap', fontdict={'fontsize':16}, pad=8);
+plt.show()
 
 # löschen, ist in Classifier integriert
 # def confmat_plot(cm, alg, vot):

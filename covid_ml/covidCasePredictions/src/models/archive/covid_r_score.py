@@ -1,7 +1,5 @@
-import os
 import sys
 
-import numpy as np
 import pandas as pd
 import pickle as pi
 from sklearn.svm import SVC
@@ -10,15 +8,12 @@ from sklearn.svm import SVC
 
 current_dir = 'covid-case-numbers'
 sys.path.append('../covid_ml/covidCasePredictions/src/features/')
-import build_features
 from build_features import *
 
 sys.path.append('../covid_ml/covidCasePredictions/src/models/')
-import train_model
-from train_model import *
+from covid_ml.covidCasePredictions.src.models.archive import train_model
 
 sys.path.append('../covid_ml/covidCasePredictions/src/visualization/')
-import visualize
 from visualize import *
 
 

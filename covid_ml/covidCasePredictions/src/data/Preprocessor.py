@@ -45,18 +45,18 @@ def leads(data, x, z:str, number = 5):
             data[z + str(lead)] = x.shift(periods=-lead)
 
 # Frage an Philipp: könnte man sowas umsetzen und falls ja: wie?
-class Split:
-    def __init__(self, X, y, n):
-        self.x = X
-        self.y = y
-        self.n = n
-
-    def get_xy(self, data, n=6):
-        X= data.iloc[:, :-n]
-        return self.X
-        print('inside function', X)
-        y = data.iloc[:, -n]
-        return self.y
+# class Split:
+#     def __init__(self, X, y, n):
+#         self.x = X
+#         self.y = y
+#         self.n = n
+#
+#     def get_xy(self, data, n=6):
+#         X= data.iloc[:, :-n]
+#         return self.X
+#         print('inside function', X)
+#         y = data.iloc[:, -n]
+#         return self.y
 
 #def split:
 
@@ -69,10 +69,9 @@ class Split:
 #     return self.normalize(self.X_train), self.normalize(self.X_test), self.y_train, self.y_test, self.scaler
 
 #
-# def split(self, data, n=6):
-#     self.X = data.iloc[:, :-n]
-#     return self.X
-#     self.y = data.iloc[:, -n]
-#     return self.y
+def split(data, n=1, m=6):
+     X = data.iloc[:, :-m]
+     y = data.iloc[:, -n]
+     return X, y
 
 
