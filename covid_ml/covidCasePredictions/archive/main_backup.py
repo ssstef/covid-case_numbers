@@ -2,8 +2,8 @@
 from datetime import date, datetime
 import os
 import sys
-sys.path.append("src/models/")
-sys.path.append("src/data/")
+sys.path.append("../src/models/")
+sys.path.append("../src/data/")
 import pandas as pd
 import plotly as plotly
 

@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import plot_confusion_matrix
 from matplotlib.pyplot import figure
 import seaborn as sns
+from operator import itemgetter
 
 # Heatmap
 import matplotlib.pyplot as plt
@@ -39,22 +40,58 @@ class Classifier:
             if self.model == 'knn':
                 # Optimalen Knn-Classifier bestimmen
                 error = []
-                for i in range(1, 40):
+                for i in range(1, 250):
                     knn = KNeighborsClassifier(n_neighbors=i)
                     knn.fit(X_train, y_train)
                     pred_i = knn.predict(X_test)
-                    error.append(np.mean(pred_i != y_test))
+                    error.append([i, np.mean(pred_i != y_test)])
+
+                # Debug-Print
+                print()
+                print("Debug KNN-Classifier")
+                print("knn n: {}".format(sorted(error, key=itemgetter(1), reverse=False)[0][0]))
+                print("knn error: {}".format(sorted(error, key=itemgetter(1), reverse=False)[0][1]))
+                print()
+
+                # Optimale Anzahl der n_neighbors übergeben
+                optimal_n = sorted(error, key=itemgetter(1), reverse=False)[0][0]
 
                 # Knn-Classifier trainieren
-                knnclf = KNeighborsClassifier(n_neighbors=7)
+                knnclf = KNeighborsClassifier(n_neighbors=optimal_n)
                 knnclf.fit(X_train, y_train)
 
                 # Knn-Classifier Akkuranz bestimmen
                 score = knnclf.score(X_test, y_test)
-                self.ergebnis.append(['knn-classifier', score, knnclf])
+                #self.ergebnis.append(['knn-classifier', score, knnclf])
+                self.ergebnis.append([knnclf.__class__.__name__, score, knnclf])
 
-                # Confusion Matrix
-                confusion_matrix(model = knnclf, X_test = X_test, y_test = y_test, name='knn')
+
+
+
+
+
+            # -----------------------
+            # Knn-Classifier
+            # -----------------------
+            # if self.model == 'knn':
+            #     # Optimalen Knn-Classifier bestimmen
+            #     error = []
+            #     for i in range(1, 40):
+            #         knn = KNeighborsClassifier(n_neighbors=i)
+            #         knn.fit(X_train, y_train)
+            #         pred_i = knn.predict(X_test)
+            #         error.append(np.mean(pred_i != y_test))
+            #
+            #     # Knn-Classifier trainieren
+            #     knnclf = KNeighborsClassifier(n_neighbors=7)
+            #     knnclf.fit(X_train, y_train)
+            #
+            #     # Knn-Classifier Akkuranz bestimmen
+            #     score = knnclf.score(X_test, y_test)
+            #     self.ergebnis.append(['knn-classifier', score, knnclf])
+            #
+            #     # Confusion Matrix
+            #     confusion_matrix(model = knnclf, X_test = X_test, y_test = y_test, name='knn')
 
             # -----------------------
 
@@ -81,7 +118,7 @@ class Classifier:
                 dt_clf = grd_clf.best_estimator_
 
                 #Besten gefundenen Decision Tree ausgeben
-               # decision_tree(best_model = dt_clf, X = X_test); auskommentiert weil der unveränderte Befehl plötzlich Fehler ausgiebt:ValueError: Length of feature_names, 56 does not match number of features, 57 Ich füge eins hinzu: ValueError: Length of feature_names, 58 does not match number of features, 57)
+                decision_tree(best_model = dt_clf, X = X_test)   #; auskommentiert weil der unveränderte Befehl plötzlich Fehler ausgiebt:ValueError: Length of feature_names, 56 does not match number of features, 57 Ich füge eins hinzu: ValueError: Length of feature_names, 58 does not match number of features, 57)
 
                 score = dt_clf.score(X_test, y_test)
                 self.ergebnis.append(['decision tree', score, dt_clf])

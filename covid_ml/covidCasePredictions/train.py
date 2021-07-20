@@ -16,11 +16,12 @@ from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder
 #import Preprocessor
 from Preprocessor import Preprocessor
 #from Preprocessor import Split  #delete later if not possible!
-#from Preprocessor import split #delete later!
+from Preprocessor import split #delete later!
 from Classifier import Classifier
 import Regressor
 from Regressor import Regressor
 from visualize import decision_tree
+from visualize import decision_tree_reg
 #from visualize import confmat_plot
 from Classifier import correlation
 from Classifier import high_correlation
@@ -73,19 +74,22 @@ list(df.columns)
 
 # Save correlation matrix
 #high_correlation(data=df)  # delete later (didn't really do anything)
-#correlation(data=df)
+correlation(data=df)
 
 print(df.head())
 
 ################################################################################################################
 # Split data into features(X) and target(y)
 # put in 1 to predict today's values, 2 for tomorrow's...up to 6 for 5 days after current day
+# Change number to 1 to predict covid cases for 5 days in the future, , 2 for 4 days in the futture.., 5 for tomorrow's , 6 for today's case numbers
+#Default is 1 for 5 days in future; number of columns not in X can also be changed if more leads were ot be generaed
+X, y = split(df)
 #split(data=df, n=6)
 # function not possible so:
 # Change number to 1 to predict coviid cases for 5 days in the future, , 2 for 4 days in the futture.., 5 for tomorrow's , 6 for today's case numbers
-number = int(6)
-X = df.iloc[:, :-6]
-y = df.iloc[:, -number]
+# number = int(6)
+# X = df.iloc[:, :-6]
+# y = df.iloc[:, -number]
 
 
 
@@ -180,6 +184,7 @@ report(random_search.cv_results_)
 #### Train regresssion
 # load dataset
 df = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead_cases.csv')  #join1 klappt !!
+
 print('columns', df.head())
 #print out column names
 col_mapping_dict = {c[0]:c[1] for c in enumerate(df.columns)}
@@ -192,10 +197,17 @@ for col in df.columns:
 
 #dataset = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead_cases.csv', header=0, index_col=0)
 ################################################################################################################
-# Change number tto 1 to predict today's case numbers, 2 for tomorrow's and so on up to 5 for 5 days in the future
-# number = int(6) (defined above)
-X = df.iloc[:, :-number]
-y = df.iloc[:, -number]
+# Change number to 1 to predict covid cases for 5 days in the future, , 2 for 4 days in the futture.., 5 for tomorrow's , 6 for today's case numbers
+#Default is 1 for 5 days in future; number of columns not in X can also be changed if more leads were ot be generaed
+X, y = split(df)
+
+print('X', X)
+print(y)
+
+# # Change number to 1 to predict today's case numbers, 2 for tomorrow's and so on up to 5 for 5 days in the future
+# number = int(1)
+# X = df.iloc[:, :-6]
+# y = df.iloc[:, -number]
 
 ################################################################################################################
 

@@ -1,9 +1,13 @@
 # Import modules
 
 import sys
+import os
 sys.path.append("src/models/")
 sys.path.append("src/data/")
 sys.path.append("src/visualization/")
+path_start = os.getcwd()
+pathr = os.path.dirname(os.getcwd()) + '/covidCasePredictions/reports/figures'
+os.chdir(pathr)
 
 
 # Warum lässt sich das hier nicht importieren?!
@@ -11,18 +15,82 @@ sys.path.append("src/visualization/")
 # lokal gespeichert/selbst geschrieben
 #from Preprocessor import Preprocessor
 #from visualize import confmat_plot
-import Classifier
+#import Classifier
 import matplotlib.pyplot as plt  # plotting
 import pandas as pd  # data processing
 
 plt.style.use('ggplot')  # Make figures pretty
+
+import seaborn as sns
+
+#Load dataset
+
+df = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_cases.csv')
+
+df['new cases in thousands'] = df.new_cases / 1000
+ax = plt.axes()
+ax.set(facecolor = "white")
+
+# Just for fun: Plot line chart including average, minimum and maximum temperature
+plt.plot( df['Unnamed: 0'], df['people_vaccinated_per_hundred'], label='vaccinated')
+plt.plot(df['Unnamed: 0'], df['new cases in thousands'],  label='new cases (*1000)')
+plt.plot(df['Unnamed: 0'], df['tmax'],  label='max tempeature')
+plt.title('Descriptives: temperature, cases, vaccinated')
+#plt.ylabel('')
+plt.grid(b=None)
+plt.xlabel('Days since start of pandemic')
+plt.legend()
+plt.savefig('Descriptives temperature, cases, vaccinated')
+plt.show()
+
+
+
+# #Korrelationen der Eingangsvariablen erkennen
+# corr_m = df.corr()
+#
+# plt.figure(figsize=(20, 20))
+# sns.set(font_scale=0.7)
+# heatmap = sns.heatmap(corr_m, vmin=-1, vmax=1, annot=False, fmt='.3f', linewidths=.1, cmap=sns.diverging_palette(20, 220, n=200))
+# heatmap.set_title('Correlation Heatmap', fontdict={'fontsize':16}, pad=8);
+# plt.savefig('heatmap.png')
+# plt.show()
+#
+#
+# corr_m = df.corr()
+# ax = sns.heatmap(
+#     corr_m,
+#     vmin=-1, vmax=1, center=0,
+#     cmap=sns.diverging_palette(20, 220, n=200),
+#     square=True
+# )
+# ax.set_xticklabels(
+#     ax.get_xticklabels(),
+#     rotation=45,
+#     horizontalalignment='right'
+# );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #To preprocess data
 #import Classifier
 from Classifier import correlation
 
 print('In this file I do descriptive analyses on the covid data generated in main_data')
 
-data = pd.DataFrame('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_lead.csv')
+data = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join_cases.csv')
 
 correlation(data=data)
 
@@ -202,3 +270,5 @@ correlation(data=data)
 # cookiecutter('cookiecutter-pypackage/')
 
 # Plotly to create interactive graphs
+
+os.chdir(path_start)

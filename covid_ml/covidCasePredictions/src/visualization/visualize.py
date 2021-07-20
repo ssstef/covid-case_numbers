@@ -60,7 +60,7 @@ def decision_tree(best_model, X):
     export_graphviz(best_model, out_file=("Covid_tree.dot"),
                     feature_names=['day since pandemic', 'total_cases',
                                      'new_cases_smoothed',
-                                     'weekly_hosp_admissions_per_million',
+                                 #    'weekly_hosp_admissions_per_million',
                                      'new_tests_smoothed_per_thousand',
                                      'positive_rate',
                                      'tests_per_case',
@@ -113,7 +113,7 @@ def decision_tree(best_model, X):
                                      'wdir',
                                      'wspd',
                                      'wpgt',
-                                     'pres',],
+                                     'pres'],
                 class_names=(['decreasing case numbers', 'increasing case numbes']), rounded=True, filled=True)
     os.system("dot -Tpng Covid_tree.dot -o Covid_tree.png")
     os.system("dot -Tps Covid_tree.dot -o Covid_tree.ps")
@@ -122,52 +122,231 @@ def decision_tree(best_model, X):
     os.chdir(path_start)
     return
 
-
+# Working regression tree
 def decision_tree_reg(best_model, X):
     plt.figure(figsize=(30, 14))
     tree.plot_tree(best_model, filled=True, fontsize=12)
 
-        # change the working directory
+    # change the working directory
     path_start = os.getcwd()
     pathr = os.path.dirname(os.getcwd()) + '/covidCasePredictions/reports/figures'
     os.chdir(pathr)
-        # first get colnames
-        # x_columns = pd.DataFrame(X)
-        # columns = x_columns.columns
-        # export_graphviz(best_model, out_file=("Covid_tree.dot"),  feature_names= columns,
-        #                 class_names=(['decreasing case numbers', 'increasing case numbes']), rounded=True, filled=True)
-        # os.system("dot -Tpng Covid_tree.dot -o Covid_tree.png")
-        # os.system("dot -Tps Covid_tree.dot -o Covid_tree.ps")
+    #first get colnames
+    #x_columns = pd.DataFrame(X)
+    #columns = x_columns.columns
+    # export_graphviz(best_model, out_file=("Covid_tree.dot"),  feature_names= columns,
+    #                 class_names=(['decreasing case numbers', 'increasing case numbes']), rounded=True, filled=True)
+    # os.system("dot -Tpng Covid_tree.dot -o Covid_tree.png")
+    # os.system("dot -Tps Covid_tree.dot -o Covid_tree.ps")
 
-        # export_graphviz(best_model, out_file=("Covid_tree.dot"), feature_names=X.columns[:],
+   # export_graphviz(best_model, out_file=("Covid_tree.dot"), feature_names=X.columns[:],
     export_graphviz(best_model, out_file=("Covid_tree_cases.dot"),
                     feature_names=['day since pandemic', 'total_cases',
-                                   'weekly_hosp_admissions_per_million', 'new_tests_smoothed_per_thousand',
-                                   'positive_rate', 'tests_per_case', 'people_vaccinated_per_hundred',
-                                   'people_fully_vaccinated_per_hundred', 'stringency_index',
-                                   'BanOnAllEvents', 'BanOnAllEventsPartial', 'ClosDaycare',
-                                   'ClosDaycarePartial', 'ClosPrim', 'ClosPrimPartial', 'ClosPubAny',
-                                   'ClosPubAnyPartial', 'ClosSec', 'ClosSecPartial', 'EntertainmentVenues',
-                                   'EntertainmentVenuesPartial', 'GymsSportsCentres',
-                                   'GymsSportsCentresPartial', 'HotelsOtherAccommodationPartial',
-                                   'IndoorOver100', 'IndoorOver1000', 'IndoorOver50',
-                                   'MasksMandatoryAllSpacesPartial', 'MasksMandatoryClosedSpaces',
-                                   'MasksVoluntaryAllSpaces', 'MassGather50', 'MassGather50Partial',
-                                   'MassGatherAll', 'MassGatherAllPartial', 'NonEssentialShops',
-                                   'NonEssentialShopsPartial', 'OutdoorOver100', 'PlaceOfWorshipPartial',
-                                   'PrivateGatheringRestrictions', 'QuarantineForInternationalTravellers',
-                                   'QuarantineForInternationalTravellersPartial', 'RestaurantsCafes',
-                                   'RestaurantsCafesPartial', 'SocialCirclePartial', 'StayHomeGen',
-                                   'StayHomeGenPartial', 'StayHomeOrderPartial', 'Teleworking',
-                                   'TeleworkingPartial', 'tavg', 'tmin', 'tmax', 'prcp', 'wdir', 'wspd',
-                                   'wpgt', 'pres', 'R_kat'], rounded=True, filled=True)
-    os.system("dot -Tpng Covid_tree_cases.dot -o Covid_tree_cases.png")
+                                  #   'new_cases_smoothed',
+                                 #    'weekly_hosp_admissions_per_million',
+                                     'new_tests_smoothed_per_thousand',
+                                     'positive_rate',
+                                     'tests_per_case',
+                                     'people_vaccinated_per_hundred',
+                                     'people_fully_vaccinated_per_hundred',
+                                     'stringency_index',
+                                     'BanOnAllEvents',
+                                     'BanOnAllEventsPartial',
+                                     'ClosDaycare',
+                                     'ClosDaycarePartial',
+                                     'ClosPrim',
+                                     'ClosPrimPartial',
+                                     'ClosPubAny',
+                                     'ClosPubAnyPartial',
+                                     'ClosSec',
+                                     'ClosSecPartial',
+                                     'EntertainmentVenues',
+                                     'EntertainmentVenuesPartial',
+                                     'GymsSportsCentres',
+                                     'GymsSportsCentresPartial',
+                                     'HotelsOtherAccommodationPartial',
+                                     'IndoorOver100',
+                                     'IndoorOver1000',
+                                     'IndoorOver50',
+                                     'MasksMandatoryAllSpacesPartial',
+                                     'MasksMandatoryClosedSpaces',
+                                     'MasksVoluntaryAllSpaces',
+                                     'MassGather50',
+                                     'MassGather50Partial',
+                                     'MassGatherAll',
+                                     'MassGatherAllPartial',
+                                     'NonEssentialShops',
+                                     'NonEssentialShopsPartial',
+                                     'OutdoorOver100',
+                                     'PlaceOfWorshipPartial',
+                                     'PrivateGatheringRestrictions',
+                                     'QuarantineForInternationalTravellers',
+                                     'QuarantineForInternationalTravellersPartial',
+                                     'RestaurantsCafes',
+                                     'RestaurantsCafesPartial',
+                                     'SocialCirclePartial',
+                                     'StayHomeGen',
+                                     'StayHomeGenPartial',
+                                     'StayHomeOrderPartial',
+                                     'Teleworking',
+                                     'TeleworkingPartial',
+                                     'tmin',
+                                     'tmax',
+                                     'prcp',
+                                     'wdir',
+                                     'wspd',
+                                     'wpgt',
+                                     'pres', 'R_kat'],
+                rounded=True, filled=True)
+    os.system("dot -Tpng Covid_tree_cases.dot -o Covid_tree_cases_neu.png")
     os.system("dot -Tps Covid_tree_cases.dot -o Covid_tree_cases.ps")
-
-        # change to the start working directory
+    print('Visualize Regression Decision Tree')
+    # change to the start working directory
     os.chdir(path_start)
     return
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
+# #
+# #  Graphviz Tree from here
+# # dot_data = tree.export_graphviz(dt_reg, out_file=None,
+# #                                 feature_names=df.feature_names,
+# #                                 filled=True)
+# # graphviz.Source(dot_data, format="png")
+#
+#
+# def decision_tree_reg(best_model, X):
+#     plt.figure(figsize=(30, 14))
+#     tree.plot_tree(best_model, filled=True, fontsize=12)
+#
+#         # change the working directory
+#     path_start = os.getcwd()
+#     pathr = os.path.dirname(os.getcwd()) + '/covidCasePredictions/reports/figures'
+#     os.chdir(pathr)
+#         #first get colnames
+#         #x_columns = pd.DataFrame(X)
+#         #columns = x_columns.columns
+#     df = pd.DataFrame(X)
+#     feature_names = df.columns
+#     export_graphviz(best_model, out_file=("Covid_tree.dot"),  feature_names= feature_names,
+#                         rounded=True, filled=True)
+#     os.system("dot -Tpng Covid_tree.dot -o Covid_tree.png")
+#     os.system("dot -Tps Covid_tree.dot -o Covid_tree.ps")
+#
+#     #     # export_graphviz(best_model, out_file=("Covid_tree.dot"), feature_names=X.columns[:],
+#     # export_graphviz(best_model, out_file=("Covid_tree_cases.dot"),
+#     #                 feature_names=['day since pandemic', 'total_cases',
+#     #                              #  'weekly_hosp_admissions_per_million',
+#     #                                'new_tests_smoothed_per_thousand',
+#     #                                'positive_rate', 'tests_per_case', 'people_vaccinated_per_hundred',
+#     #                                'people_fully_vaccinated_per_hundred', 'stringency_index',
+#     #                                'BanOnAllEvents', 'BanOnAllEventsPartial', 'ClosDaycare',
+#     #                                'ClosDaycarePartial', 'ClosPrim', 'ClosPrimPartial', 'ClosPubAny',
+#     #                                'ClosPubAnyPartial', 'ClosSec', 'ClosSecPartial', 'EntertainmentVenues',
+#     #                                'EntertainmentVenuesPartial', 'GymsSportsCentres',
+#     #                                'GymsSportsCentresPartial', 'HotelsOtherAccommodationPartial',
+#     #                                'IndoorOver100', 'IndoorOver1000', 'IndoorOver50',
+#     #                                'MasksMandatoryAllSpacesPartial', 'MasksMandatoryClosedSpaces',
+#     #                                'MasksVoluntaryAllSpaces', 'MassGather50', 'MassGather50Partial',
+#     #                                'MassGatherAll', 'MassGatherAllPartial', 'NonEssentialShops',
+#     #                                'NonEssentialShopsPartial', 'OutdoorOver100', 'PlaceOfWorshipPartial',
+#     #                                'PrivateGatheringRestrictions', 'QuarantineForInternationalTravellers',
+#     #                                'QuarantineForInternationalTravellersPartial', 'RestaurantsCafes',
+#     #                                'RestaurantsCafesPartial', 'SocialCirclePartial', 'StayHomeGen',
+#     #                                'StayHomeGenPartial', 'StayHomeOrderPartial', 'Teleworking',
+#     #                                'TeleworkingPartial', 'tavg', 'tmin', 'tmax', 'prcp', 'wdir', 'wspd',
+#     #                                'wpgt', 'pres', 'R_kat'], rounded=True, filled=True)
+#     # os.system("dot -Tpng Covid_tree_cases.dot -o Covid_tree_cases.png")
+#     # os.system("dot -Tps Covid_tree_cases.dot -o Covid_tree_cases.ps")
+#
+#         # change to the start working directory
+#     os.chdir(path_start)
+#     return
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+# def decision_tree_reg2(best_model, X):
+#     plt.figure(figsize=(30, 14))
+#     tree.plot_tree(best_model, filled=True, fontsize=12)
+#
+#         # change the working directory
+#     path_start = os.getcwd()
+#     pathr = os.path.dirname(os.getcwd()) + '/covidCasePredictions/reports/figures'
+#     os.chdir(pathr)
+#         # first get colnames
+#         # x_columns = pd.DataFrame(X)
+#         # columns = x_columns.columns
+#         # export_graphviz(best_model, out_file=("Covid_tree.dot"),  feature_names= columns,
+#         #                 class_names=(['decreasing case numbers', 'increasing case numbes']), rounded=True, filled=True)
+#         # os.system("dot -Tpng Covid_tree.dot -o Covid_tree.png")
+#         # os.system("dot -Tps Covid_tree.dot -o Covid_tree.ps")
+#
+#         # export_graphviz(best_model, out_file=("Covid_tree.dot"), feature_names=X.columns[:],
+#     export_graphviz(best_model, out_file=("Covid_tree_cases.dot"),
+#                     feature_names=['day since pandemic', 'total_cases',
+#                                  #  'weekly_hosp_admissions_per_million',
+#                                    'new_tests_smoothed_per_thousand',
+#                                    'positive_rate', 'tests_per_case', 'people_vaccinated_per_hundred',
+#                                    'people_fully_vaccinated_per_hundred', 'stringency_index',
+#                                    'BanOnAllEvents', 'BanOnAllEventsPartial', 'ClosDaycare',
+#                                    'ClosDaycarePartial', 'ClosPrim', 'ClosPrimPartial', 'ClosPubAny',
+#                                    'ClosPubAnyPartial', 'ClosSec', 'ClosSecPartial', 'EntertainmentVenues',
+#                                    'EntertainmentVenuesPartial', 'GymsSportsCentres',
+#                                    'GymsSportsCentresPartial', 'HotelsOtherAccommodationPartial',
+#                                    'IndoorOver100', 'IndoorOver1000', 'IndoorOver50',
+#                                    'MasksMandatoryAllSpacesPartial', 'MasksMandatoryClosedSpaces',
+#                                    'MasksVoluntaryAllSpaces', 'MassGather50', 'MassGather50Partial',
+#                                    'MassGatherAll', 'MassGatherAllPartial', 'NonEssentialShops',
+#                                    'NonEssentialShopsPartial', 'OutdoorOver100', 'PlaceOfWorshipPartial',
+#                                    'PrivateGatheringRestrictions', 'QuarantineForInternationalTravellers',
+#                                    'QuarantineForInternationalTravellersPartial', 'RestaurantsCafes',
+#                                    'RestaurantsCafesPartial', 'SocialCirclePartial', 'StayHomeGen',
+#                                    'StayHomeGenPartial', 'StayHomeOrderPartial', 'Teleworking',
+#                                    'TeleworkingPartial', 'tavg', 'tmin', 'tmax', 'prcp', 'wdir', 'wspd',
+#                                    'wpgt', 'pres', 'R_kat'], rounded=True, filled=True)
+#     os.system("dot -Tpng Covid_tree_cases.dot -o Covid_tree_cases.png")
+#     os.system("dot -Tps Covid_tree_cases.dot -o Covid_tree_cases.ps")
+#
+#         # change to the start working directory
+#     os.chdir(path_start)
+#     return
+#
 
     # export_graphviz(best_model, out_file=("Covid_tree.dot"),  feature_names=['day since pandemic' , 'total_cases', 'new_cases', 'new_cases_smoothed',
     #    'total_cases_per_million', 'new_cases_per_million',
@@ -287,7 +466,15 @@ def correlation(data):
     )
 
 
-
+# import seaborn as sns
+# #Korrelationen der Eingangsvariablen erkennen
+# corr_matrix = daten.corr()
+#
+# plt.figure(figsize=(20, 20))
+# sns.set(font_scale=0.7)
+# heatmap = sns.heatmap(corr_matrix, vmin=-1, vmax=1, annot=True, fmt='.3f', linewidths=.1)
+# heatmap.set_title('Correlation Heatmap', fontdict={'fontsize':16}, pad=8);
+# plt.show()
 
 # löschen, ist in Classifier integriert
 # def confmat_plot(cm, alg, vot):

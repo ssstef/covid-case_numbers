@@ -13,7 +13,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 
 import matplotlib.pyplot as plt
-dataset = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join1.csv') #, usecols=[1], engine='python')
+dataset = pd.read_csv('/covid_ml/covidCasePredictions/data/processed/join1.csv') #, usecols=[1], engine='python')
 plt.plot(dataset)
 #plt.show()
 
@@ -22,7 +22,7 @@ plt.plot(dataset)
 np.random.seed(7)
 
 # load the dataset
-dataframe = pd.read_csv('/Users/stefanieunger/PycharmProjects/covid-case_numbers/covid_ml/covidCasePredictions/data/processed/join1.csv')  #, usecols=[1], engine='python')
+dataframe = pd.read_csv('/covid_ml/covidCasePredictions/data/processed/join1.csv')  #, usecols=[1], engine='python')
 
 dataset = dataframe.values
 
