@@ -1,5 +1,8 @@
 import os
 import sys
+
+from covid_ml.covidCasePredictions.src.visualization.visualize import decision_tree
+
 sys.path.append('visualization')
 from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeRegressor
@@ -7,6 +10,8 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble import RandomForestRegressor
 import visualize
 from visualize import decision_tree_reg
+from sklearn import tree
+from sklearn.tree import export_graphviz
 from sklearn.datasets import make_regression
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn import svm
@@ -66,28 +71,32 @@ class Regressor:
 
                 # Optimalen Decision Tree bestimmen
                 # Zu testende Decision Tree Parameter
-                dt = DecisionTreeRegressor(criterion ='mse', max_depth=7, min_samples_split = 5)
+                dt_reg = DecisionTreeRegressor(criterion ='mse', max_depth=5, min_samples_split = 5)
                 #tree_para = {'criterion': ['gini', 'entropy'], 'max_depth': [i for i in range(1, 20)],
                  #            'min_samples_split': [i for i in range(2, 20)]}
 
                 # GridSearchCV
-                #grd_reg = GridSearchCV(dt, tree_para, cv=5)
+                #grd_reg = GridSearchCV(dt_reg, tree_para, cv=5)
                 #grd_reg.fit(X_train, y_train)
+                print('Regression Decision Tree ausführen')
 
                 # Besten gefundenen Decision Tree übergeben
                 #dt_reg = grd_reg.best_estimator_
 
-                # Besten gefundenen Decision Tree ausgeben
-                #decision_tree(best_model=dt_reg, X=X_test)
-
                 # Fit decision tree
-                dt.fit(X_train, y_train)
+                dt_reg.fit(X_train, y_train)
+
+
+
+                # Besten gefundenen Decision Tree ausgeben
+                decision_tree_reg(best_model=dt_reg, X=X_test)
+                print('Regression Decision Tree Ausgabe beendet')
 
                 # Decision Tree ausgeben (wenn Zeit besten Tree suchen und den ausgeben!=
                # decision_tree_reg(best_model=dt, X=X_test) auskommentiert weil der unveränderte Befehl plötzlich Fehler ausgiebt:ValueError: Length of feature_names, 56 does not match number of features, 57 Ich füge eins hinzu: ValueError: Length of feature_names, 58 does not match number of features, 57)
 
-                score = dt.score(X_test, y_test)
-                self.ergebnis.append(['decision tree', score, dt])
+                score = dt_reg.score(X_test, y_test)
+                self.ergebnis.append(['decision tree', score, dt_reg])
 
             # -----------------------
 

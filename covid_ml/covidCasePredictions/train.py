@@ -21,6 +21,7 @@ from Classifier import Classifier
 import Regressor
 from Regressor import Regressor
 from visualize import decision_tree
+from visualize import decision_tree_reg
 #from visualize import confmat_plot
 from Classifier import correlation
 from Classifier import high_correlation

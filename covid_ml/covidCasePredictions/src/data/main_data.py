@@ -261,7 +261,8 @@ df.drop(['new_vaccinations_smoothed_per_million', 'excess_mortality', 'new_vacci
 df.drop(['new_cases', 'total_cases_per_million', 'new_cases_per_million', 'new_cases_smoothed_per_million', 'new_deaths_smoothed_per_million'], axis=1, inplace=True)
 #Delete when predicting cases, not if trying to predict deaths! Then keep one for hospitalization, one fo deaths
 df.drop(['icu_patients' ,'icu_patients_per_million', 'total_deaths', 'new_deaths' ,	'new_deaths_smoothed', 'total_deaths_per_million', 'new_deaths_per_million'], axis=1, inplace=True)
-# Delete more because too many variables, some quiet correlated
+# Finally delete hospitalization
+df.drop(['weekly_hosp_admissions_per_million'], axis=1, inplace=True)
 
 
 columns_df = df.columns
@@ -291,7 +292,7 @@ leads(data= df, x= df.R_kat, z= 'r_kat_lead_', number=5)  # defined in Preproces
 # Drop rows that have missing values now. Those that cannot use lead/lag variables at beginning/end of datsaet
 df.dropna(axis = 0, inplace=True)
 
-print(df.head())
+print('everything dropped?', df.head())
 
 ####################################################################################################
 # Here I save the analysis data for the Classification analyses
