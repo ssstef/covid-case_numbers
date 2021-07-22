@@ -130,7 +130,7 @@ model.add(Dense(1))
 #######model.add(Dense(no_classes, activation='softmax'))  ## added this(end with softmax...) destroys the entire model..
 model.compile(loss='mae', optimizer='adam', metrics=['accuracy'] )
 #model.compile(loss='mae', optimizer='adam')  ##this woks
-metrics=['accuracy']
+metrics=['mse']
 # fit network
 history = model.fit(train_X, train_y, epochs=90, batch_size=72, validation_data=(test_X, test_y), verbose=2,
                     shuffle=False)
@@ -214,10 +214,24 @@ del model
 # design network
 model = Sequential()
 model.add(LSTM(50, input_shape=(X_reshaped.shape[1], X_reshaped.shape[2])))
+#model.add(Dense(30, activation = 'relu'))
 model.add(Dense(1))
-model.compile(loss='mae', optimizer='adam')
+
+# model = Sequential()
+# model.add(LSTM(60, input_shape=(X_reshaped.shape[1], X_reshaped.shape[2])))
+# model.add(Dense(50, activation = 'relu'))
+# model.add(Dense(30, activation = 'relu'))
+# model.add(Dense(1))
+
+
+#model.compile(loss='mae', optimizer='adam')
+model.compile(
+    optimizer='adam',
+    loss='mse',
+    metrics=[tf.keras.metrics.MeanSquaredError()])
+
 # fit network
-history = model.fit(X_reshaped, y, epochs=90, batch_size=72, verbose=2,
+history = model.fit(X_reshaped, y, epochs=80, batch_size=72, verbose=2,
                     shuffle=False)
 
 
