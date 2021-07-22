@@ -33,6 +33,8 @@ import pickle as pi
 import matplotlib.pyplot as plt
 
 
+from operator import itemgetter
+
 #cross_val_score(regressor, X, y, cv=10)
 
 class Regressor:
@@ -46,22 +48,51 @@ class Regressor:
         # KNN
         # -----------------------
             if self.model == 'knn':
-            # Optimalen Knn-Classifier bestimmen
+                # Optimalen Knn-Classifier bestimmen
                 error = []
-                for i in range(1, 40):
+                for i in range(1, 250):
                     knn = KNeighborsRegressor(n_neighbors=i)
                     knn.fit(X_train, y_train)
-                    pred_i = knn.predict(X_test)  #print(knn.predict([[1.5]]))
-                    error.append(np.mean(pred_i != y_test))
-                    #error.append(score(X_test, y_test, sample_weight=None))
+                    pred_i = knn.predict(X_test)
+                    error.append([i, np.mean(pred_i != y_test)])
 
-                 # Knn-Classifier trainieren
-                knnreg = KNeighborsRegressor(n_neighbors=7)
+                # Debug-Print
+                print()
+                print("Debug KNN-Classifier")
+                print("knn n: {}".format(sorted(error, key=itemgetter(1), reverse=False)[0][0]))
+                print("knn error: {}".format(sorted(error, key=itemgetter(1), reverse=False)[0][1]))
+                print()
+
+                # Optimale Anzahl der n_neighbors übergeben
+                optimal_n = sorted(error, key=itemgetter(1), reverse=False)[0][0]
+
+                # Knn-Classifier trainieren
+                knnreg = KNeighborsRegressor(n_neighbors=optimal_n)
                 knnreg.fit(X_train, y_train)
 
                 # Knn-Classifier Akkuranz bestimmen
                 score = knnreg.score(X_test, y_test)
-                self.ergebnis.append(['knn-regressor', score, knn])
+                self.ergebnis.append(['knn-regressor', score, knnreg])
+
+
+
+            # if self.model == 'knn':
+            # # Optimalen Knn-Classifier bestimmen
+            #     error = []
+            #     for i in range(1, 40):
+            #         knn = KNeighborsRegressor(n_neighbors=i)
+            #         knn.fit(X_train, y_train)
+            #         pred_i = knn.predict(X_test)  #print(knn.predict([[1.5]]))
+            #         error.append(np.mean(pred_i != y_test))
+            #         #error.append(score(X_test, y_test, sample_weight=None))
+            #
+            #      # Knn-Classifier trainieren
+            #     knnreg = KNeighborsRegressor(n_neighbors=7)
+            #     knnreg.fit(X_train, y_train)
+            #
+            #     # Knn-Classifier Akkuranz bestimmen
+            #     score = knnreg.score(X_test, y_test)
+            #     self.ergebnis.append(['knn-regressor', score, knn])
 
             # -----------------------
             # Decision Tree
@@ -107,8 +138,8 @@ class Regressor:
 
            # rf = RandomForestClassifier(max_depth=8, criterion="entropy", min_samples_split=9)
                 rf = RandomForestRegressor(criterion="mse", max_depth=10, n_estimators=100, random_state=14)
-                #forrest_para = {'criterion': ['gini', 'entropy'], 'max_depth': [i for i in range(1, 20)],
-                 #            'min_samples_split': [i for i in range(2, 20)]}
+                #forrest_para = {'criterion': ['gini'], 'max_depth': [i for i in range(1, 10)],
+                           # 'min_samples_split': [i for i in range(4, 20)]}
 
                 rf.fit(X_train, y_train)
 
@@ -120,6 +151,10 @@ class Regressor:
                 #rf_reg = grd_rf.best_estimator_
 
                 score = rf.score(X_test, y_test)
+                #Check which features are most relevant.
+                #feature_importances = feature_importances_
+                #print('Feature Importance best random tree', feature_importances)
+
                 self.ergebnis.append(['random forest', score, rf])  # rf_reg, davor rf
 
             # -----------------------
